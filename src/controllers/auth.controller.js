@@ -27,3 +27,22 @@ exports.login = async (req, res) => {
     role:user.role,
   });
 };
+
+exports.validateToken = async (req, res) => {
+  try {
+    const user = req.user;
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    res.json({
+      message: 'Token is valid',
+      userId: user.userId,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
