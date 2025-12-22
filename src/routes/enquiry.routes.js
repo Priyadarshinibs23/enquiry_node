@@ -14,6 +14,7 @@ router.delete('/:id', auth, role(['ADMIN', 'COUNSELLOR']), controller.deleteEnqu
 
 
 /* Change Enquiry Status */
-router.post('/change-status', auth, role(['ADMIN', 'COUNSELLOR', 'HR', 'ACCOUNTS']), controller.changeEnquiryStatus);
+router.post('/change-status', auth, role(['ADMIN', 'COUNSELLOR', 'HR', 'ACCOUNTS']),
+    controller.changeEnquiryStatus);
 
 module.exports = router;

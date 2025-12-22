@@ -12,6 +12,8 @@ db.User = require('./user')(sequelize, DataTypes);
 db.Subject = require('./subject')(sequelize, DataTypes);
 db.Package = require('./package')(sequelize, DataTypes);
 db.Enquiry = require('./enquiry')(sequelize, DataTypes);
+db.Log = require('./log')(sequelize, DataTypes);
+db.Billing = require('./billing')(sequelize, DataTypes);
 
 
 // Many-to-many association between Package and Subject using join table 'PackageSubjects'
@@ -24,6 +26,24 @@ db.Subject.belongsToMany(db.Package, {
 	through: 'PackageSubjects',
 	foreignKey: 'subjectId',
 	otherKey: 'packageId',
+});
+
+// One-to-many association between User and Log
+db.User.hasMany(db.Log, {
+	foreignKey: 'userId',
+	onDelete: 'CASCADE',
+});
+db.Log.belongsTo(db.User, {
+	foreignKey: 'userId',
+});
+
+// One-to-many association between Enquiry and Billing
+db.Enquiry.hasMany(db.Billing, {
+	foreignKey: 'enquiryId',
+	onDelete: 'CASCADE',
+});
+db.Billing.belongsTo(db.Enquiry, {
+	foreignKey: 'enquiryId',
 });
 
 module.exports = db;
