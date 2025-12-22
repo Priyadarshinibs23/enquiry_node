@@ -4,11 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       code: DataTypes.STRING,
-      subjectIds: {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
-        allowNull: true,
-        defaultValue: [],
-      },
     },
     {
       tableName: 'packages',

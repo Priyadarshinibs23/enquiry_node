@@ -13,8 +13,17 @@ db.Subject = require('./subject')(sequelize, DataTypes);
 db.Package = require('./package')(sequelize, DataTypes);
 db.Enquiry = require('./enquiry')(sequelize, DataTypes);
 
-// Associations
-db.Subject.hasMany(db.Package, { foreignKey: 'subjectId' });
-db.Package.belongsTo(db.Subject, { foreignKey: 'subjectId' });
+
+// Many-to-many association between Package and Subject using join table 'PackageSubjects'
+db.Package.belongsToMany(db.Subject, {
+	through: 'PackageSubjects',
+	foreignKey: 'packageId',
+	otherKey: 'subjectId',
+});
+db.Subject.belongsToMany(db.Package, {
+	through: 'PackageSubjects',
+	foreignKey: 'subjectId',
+	otherKey: 'packageId',
+});
 
 module.exports = db;

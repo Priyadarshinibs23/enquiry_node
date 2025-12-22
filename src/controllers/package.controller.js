@@ -19,15 +19,25 @@ exports.createPackage = async (req, res) => {
       return res.status(404).json({ message: 'One or more subjects not found' });
     }
 
-    const pkg = await Package.create({ name, code, subjectIds });
+    const pkg = await Package.create({ name, code });
+    await pkg.setSubjects(subjectIds);
 
-    res.status(201).json({
+    // Fetch with subjects for response, exclude join table
+    const pkgWithSubjects = await Package.findByPk(pkg.id, {
+      include: {
+        model: Subject,
+        attributes: ['id', 'name', 'code'],
+        through: { attributes: [] },
+      },
+    });
+
+    return res.status(201).json({
       message: 'Package created successfully',
-      package: pkg,
+      package: pkgWithSubjects,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -40,13 +50,13 @@ exports.getAllPackages = async (req, res) => {
       include: {
         model: Subject,
         attributes: ['id', 'name', 'code'],
+        through: { attributes: [] },
       },
     });
-
-    res.json(packages);
+    return res.status(200).json(packages);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -56,7 +66,11 @@ exports.getAllPackages = async (req, res) => {
 exports.getPackageById = async (req, res) => {
   try {
     const pkg = await Package.findByPk(req.params.id, {
-      include: Subject,
+      include: {
+        model: Subject,
+        attributes: ['id', 'name', 'code'],
+        through: { attributes: [] },
+      },
     });
 
     if (!pkg) {
@@ -65,10 +79,10 @@ exports.getPackageById = async (req, res) => {
       });
     }
 
-    res.json(pkg);
+    return res.status(200).json(pkg);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -97,14 +111,23 @@ exports.updatePackage = async (req, res) => {
     }
 
     await pkg.update(req.body);
-
-    res.json({
+    if (subjectIds) {
+      await pkg.setSubjects(subjectIds);
+    }
+    // Fetch with subjects for response
+    const pkgWithSubjects = await Package.findByPk(pkg.id, {
+      include: {
+        model: Subject,
+        attributes: ['id', 'name', 'code'],
+      },
+    });
+    return res.status(200).json({
       message: 'Package updated successfully',
-      package: pkg,
+      package: pkgWithSubjects,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -123,11 +146,11 @@ exports.deletePackage = async (req, res) => {
 
     await pkg.destroy();
 
-    res.json({
+    return res.status(200).json({
       message: 'Package deleted successfully',
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };

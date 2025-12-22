@@ -30,7 +30,13 @@ exports.createSubject = async (req, res) => {
  */
 exports.getAllSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.findAll();
+    const subjects = await Subject.findAll({
+      include: {
+        model: require('../models').Package,
+        attributes: ['id', 'name', 'code'],
+        through: { attributes: [] },
+      },
+    });
     res.json(subjects);
   } catch (error) {
     console.error(error);
@@ -43,7 +49,13 @@ exports.getAllSubjects = async (req, res) => {
  */
 exports.getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findByPk(req.params.id);
+    const subject = await Subject.findByPk(req.params.id, {
+      include: {
+        model: require('../models').Package,
+        attributes: ['id', 'name', 'code'],
+        through: { attributes: [] },
+      },
+    });
 
     if (!subject) {
       return res.status(404).json({
@@ -103,6 +115,6 @@ exports.deleteSubject = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
