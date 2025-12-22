@@ -4,12 +4,12 @@ const role = require('../middlewares/role.middleware');
 const controller = require('../controllers/billing.controller');
 
 /* READ — ALL LOGGED-IN USERS */
-router.get('/', auth, controller.getAllBillings);
-router.get('/enquiry/:enquiryId', auth, controller.getBillingByEnquiryId);
-router.get('/:id', auth, controller.getBillingById);
+router.get('/', auth, role(['ADMIN', 'ACCOUNTS']), controller.getAllBillings);
+router.get('/enquiry/:enquiryId', auth, role(['ADMIN', 'ACCOUNTS']), controller.getBillingByEnquiryId);
+router.get('/:id', auth, role(['ADMIN', 'ACCOUNTS']), controller.getBillingById);
 
 /* WRITE — ALL LOGGED-IN USERS (CREATE/UPDATE COMBINED) */
-router.post('/', auth, controller.createOrUpdateBilling);
+router.post('/', auth, role(['ADMIN', 'ACCOUNTS']), controller.createOrUpdateBilling);
 
 /* DELETE — ADMIN ONLY */
 router.delete('/:id', auth, role(['ADMIN']), controller.deleteBilling);
