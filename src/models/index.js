@@ -11,6 +11,7 @@ db.Sequelize = Sequelize;
 db.User = require('./user')(sequelize, DataTypes);
 db.Subject = require('./subject')(sequelize, DataTypes);
 db.Package = require('./package')(sequelize, DataTypes);
+db.Enquiry = require('./enquiry')(sequelize, DataTypes);
 
 // Associations
 db.Subject.hasMany(db.Package, { foreignKey: 'subjectId' });
