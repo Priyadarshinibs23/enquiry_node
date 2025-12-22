@@ -45,7 +45,7 @@ exports.createUser = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         console.log("Inside change password controller");
-        const { id, oldPassword, newPassword } = req.body;
+        const { id, newPassword } = req.body;
         const userrole = req.user.role;
         if (userrole !== 'ADMIN') {
             return res.status(403).json({ message: 'Access denied' });
@@ -53,10 +53,6 @@ exports.changePassword = async (req, res) => {
         const user = await User.findByPk(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
-        }
-        const isMatch = await user.comparePassword(oldPassword);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Old password is incorrect' });
         }
         const hashed = await hashPassword(newPassword);
         user.password = hashed;
