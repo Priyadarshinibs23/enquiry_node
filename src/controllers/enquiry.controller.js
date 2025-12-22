@@ -1,4 +1,5 @@
 const { Enquiry } = require('../models');
+const { Op } = require('sequelize');
 
 /**
  * CREATE Enquiry (ADMIN only)
@@ -7,9 +8,13 @@ exports.createEnquiry = async (req, res) => {
   try {
     const { email, phone } = req.body;
     // Check for existing enquiry with same email or phone
+    if(!email || !phone) {
+      return res.status(400).json({ message: 'Email and phone are required' });
+    }
+    
     const existing = await Enquiry.findOne({
       where: {
-        [Enquiry.sequelize.Op.or]: [
+        [Op.or]: [
           { email },
           { phone }
         ]
@@ -82,11 +87,11 @@ exports.updateEnquiry = async (req, res) => {
     if (email || phone) {
       const existing = await Enquiry.findOne({
         where: {
-          [Enquiry.sequelize.Op.or]: [
+          [Op.or]: [
             email ? { email } : {},
             phone ? { phone } : {}
           ],
-          id: { [Enquiry.sequelize.Op.ne]: enquiry.id }
+          id: { [Op.ne]: enquiry.id }
         }
       });
       if (existing) {
