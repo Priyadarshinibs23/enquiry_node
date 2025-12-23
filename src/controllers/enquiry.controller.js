@@ -71,10 +71,16 @@ exports.getEnquiryById = async (req, res) => {
 };
 
 /**
- * UPDATE enquiry (ADMIN only)
+ * UPDATE enquiry (ADMIN and COUNSELLOR)
  */
 exports.updateEnquiry = async (req, res) => {
   try {
+    // Check if user role is COUNSELLOR or ADMIN
+    const userrole = req.user.role;
+    if (userrole !== 'COUNSELLOR' && userrole !== 'ADMIN') {
+      return res.status(403).json({ message: 'Only ADMIN and COUNSELLOR can edit enquiries' });
+    }
+
     const enquiry = await Enquiry.findByPk(req.params.id);
 
     if (!enquiry) {

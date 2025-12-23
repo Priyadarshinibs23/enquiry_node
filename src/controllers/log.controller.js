@@ -59,7 +59,7 @@ exports.getLogsByEnquiryId = async (req, res) => {
             include: [
                 {
                     model: require('../models').User,
-                    attributes: ['id', 'email', 'role'],
+                    attributes: ['id', 'email', 'role','name'],
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -97,11 +97,12 @@ exports.deleteLog = async (req, res) => {
 };
 
 /**
- * UPDATE log (ONLY BY THE USER WHO CREATED IT)
+ * UPDATE log (ADMIN, COUNSELLOR, OR THE USER WHO CREATED IT)
  */
 exports.updateLog = async (req, res) => {
     try {
         const userId = req.user.userId;
+        const userRole = req.user.role;
         const { title, description } = req.body;
         const logId = req.params.id;
 
@@ -119,10 +120,10 @@ exports.updateLog = async (req, res) => {
             });
         }
 
-        // Check if the user who is trying to update is the one who created it
-        if (log.userId !== userId) {
+        // Check if the user has permission to update (creator, ADMIN, or COUNSELLOR)
+        if (log.userId !== userId && userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
             return res.status(403).json({
-                message: 'You can only edit logs that you created',
+                message: 'Only ADMIN, COUNSELLOR, or the log creator can edit this log',
             });
         }
 

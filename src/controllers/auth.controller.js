@@ -18,6 +18,7 @@ exports.login = async (req, res) => {
 
     const token = await signToken({
       userId: user.id,
+      name: user.name,
       email: user.email,
       role: user.role,
     });
@@ -25,6 +26,8 @@ exports.login = async (req, res) => {
     return res.json({
       message: 'Login successful',
       token,
+      name: user.name,
+      email: user.email,
       role: user.role,
     });
   } catch (error) {
@@ -44,6 +47,7 @@ exports.validateToken = async (req, res) => {
     return res.status(200).json({
       message: 'Token is valid',
       userId: user.userId,
+      name: user.name,
       email: user.email,
       role: user.role,
     });
