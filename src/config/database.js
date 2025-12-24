@@ -6,11 +6,13 @@ if (dbUrl) {
   // Use DATABASE_URL for production (Render, Heroku, etc)
   module.exports = {
     development: {
-      use_env_variable: 'DATABASE_URL',
       dialect: 'postgres',
+      url: dbUrl,
       dialectOptions: {
-        ssl: true,
-        rejectUnauthorized: false,
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
       },
     },
   };
