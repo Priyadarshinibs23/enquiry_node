@@ -3,8 +3,18 @@ require('dotenv').config();
 const dbUrl = process.env.DATABASE_URL;
 
 if (dbUrl) {
-  // Use DATABASE_URL for production (Render, Heroku, etc)
+  // Production/Neon configuration
   module.exports = {
+    production: {
+      dialect: 'postgres',
+      url: dbUrl,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      },
+    },
     development: {
       dialect: 'postgres',
       url: dbUrl,
@@ -17,7 +27,7 @@ if (dbUrl) {
     },
   };
 } else {
-  // Use individual env vars for local development
+  // Local development fallback
   module.exports = {
     development: {
       username: process.env.DB_USER,
