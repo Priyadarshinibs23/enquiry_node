@@ -1,7 +1,29 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/database').development;
 
-const sequelize = new Sequelize(config);
+let sequelize;
+
+if (config.url) {
+  // Neon / Production / DATABASE_URL
+  sequelize = new Sequelize(config.url, {
+    dialect: config.dialect,
+    dialectOptions: config.dialectOptions,
+    logging: false,
+  });
+} else {
+  // Local DB
+  sequelize = new Sequelize(
+    config.database,
+    config.username,
+    String(config.password || ''),
+    {
+      host: config.host,
+      port: config.port,
+      dialect: config.dialect,
+      logging: false,
+    }
+  );
+}
 
 const db = {};
 
@@ -15,35 +37,23 @@ db.Enquiry = require('./enquiry')(sequelize, DataTypes);
 db.Log = require('./log')(sequelize, DataTypes);
 db.Billing = require('./billing')(sequelize, DataTypes);
 
-
-// Many-to-many association between Package and Subject using join table 'PackageSubjects'
+/* relations stay same */
 db.Package.belongsToMany(db.Subject, {
-	through: 'PackageSubjects',
-	foreignKey: 'packageId',
-	otherKey: 'subjectId',
+  through: 'PackageSubjects',
+  foreignKey: 'packageId',
+  otherKey: 'subjectId',
 });
+
 db.Subject.belongsToMany(db.Package, {
-	through: 'PackageSubjects',
-	foreignKey: 'subjectId',
-	otherKey: 'packageId',
+  through: 'PackageSubjects',
+  foreignKey: 'subjectId',
+  otherKey: 'packageId',
 });
 
-// One-to-many association between User and Log
-db.User.hasMany(db.Log, {
-	foreignKey: 'userId',
-	onDelete: 'CASCADE',
-});
-db.Log.belongsTo(db.User, {
-	foreignKey: 'userId',
-});
+db.User.hasMany(db.Log, { foreignKey: 'userId', onDelete: 'CASCADE' });
+db.Log.belongsTo(db.User, { foreignKey: 'userId' });
 
-// One-to-many association between Enquiry and Billing
-db.Enquiry.hasMany(db.Billing, {
-	foreignKey: 'enquiryId',
-	onDelete: 'CASCADE',
-});
-db.Billing.belongsTo(db.Enquiry, {
-	foreignKey: 'enquiryId',
-});
+db.Enquiry.hasMany(db.Billing, { foreignKey: 'enquiryId', onDelete: 'CASCADE' });
+db.Billing.belongsTo(db.Enquiry, { foreignKey: 'enquiryId' });
 
 module.exports = db;
