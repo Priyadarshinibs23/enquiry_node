@@ -2,44 +2,38 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./models');
 
-const PORT = process.env.PORT || 3000;
-
-// Debug: Log environment variables (remove passwords in production logs)
-console.log('Environment Check:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Set (length: ' + process.env.DATABASE_URL.length + ')' : '❌ Not Set');
-console.log('PORT:', PORT);
+const PORT = process.env.PORT || 4000;
 
 (async () => {
   try {
-    console.log('Attempting to connect to database...');
-    await sequelize.authenticate();
-    console.log('✅ Database connected successfully');
+    // Test database connection with retry logic
+    let retries = 3;
+    let connected = false;
 
-    // Sync database (optional, be careful in production)
-    if (process.env.NODE_ENV !== 'production') {
-      await sequelize.sync({ alter: true });
+    while (retries > 0 && !connected) {
+      try {
+        await sequelize.authenticate();
+        console.log('✓ Database connected successfully');
+        connected = true;
+      } catch (error) {
+        retries--;
+        if (retries > 0) {
+          console.log(`Database connection failed, retrying... (${retries} attempts left)`);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+        } else {
+          throw error;
+        }
+      }
     }
 
-    // Listen on 0.0.0.0 for Render compatibility
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    // Start server
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✓ Server running on port ${PORT}`);
+      console.log(`✓ Health check: http://localhost:${PORT}/api/health`);
     });
-
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('SIGTERM received, closing server gracefully...');
-      server.close(() => {
-        sequelize.close();
-        console.log('Server closed');
-        process.exit(0);
-      });
-    });
-
   } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
-    console.error('Error details:', error);
+    console.error('Failed to start server:', error.message);
+    console.error('Full error:', error);
     process.exit(1);
   }
 })();
