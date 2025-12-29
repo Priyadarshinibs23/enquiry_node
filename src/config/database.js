@@ -2,9 +2,11 @@ require('dotenv').config();
 
 const dbUrl = process.env.DATABASE_URL;
 
+console.log('Config - DATABASE_URL present:', !!dbUrl);
+
 if (dbUrl) {
   // Production/Neon configuration
-  module.exports = {
+  const config = {
     production: {
       dialect: 'postgres',
       url: dbUrl,
@@ -14,6 +16,13 @@ if (dbUrl) {
           rejectUnauthorized: false,
         },
       },
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+      logging: false,
     },
     development: {
       dialect: 'postgres',
@@ -24,10 +33,15 @@ if (dbUrl) {
           rejectUnauthorized: false,
         },
       },
+      logging: console.log,
     },
   };
+  
+  console.log('Using DATABASE_URL configuration');
+  module.exports = config;
 } else {
   // Local development fallback
+  console.log('Using local PostgreSQL configuration');
   module.exports = {
     development: {
       username: process.env.DB_USER,
@@ -36,6 +50,7 @@ if (dbUrl) {
       host: process.env.DB_HOST || '127.0.0.1',
       port: process.env.DB_PORT || 5432,
       dialect: 'postgres',
+      logging: console.log,
     },
   };
 }
