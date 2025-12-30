@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm install",
-  "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
   },
@@ -9,13 +7,8 @@
     "src/server.js": {
       "memory": 1024,
       "maxDuration": 30,
-      "runtime": "nodejs20.x"
+      "includeFiles": "node_modules/pg/**",
+      "includeFiles": "node_modules/pg-hstore/**"
     }
-  },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/server.js"
-    }
-  ]
+  }
 }

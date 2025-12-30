@@ -1,14 +1,13 @@
-const { SignJWT, jwtVerify } = require('jose');
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+const jwt = require('jsonwebtoken');
 
 exports.signToken = async (payload) => {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime(process.env.JWT_EXPIRES_IN)
-    .sign(secret);
+  return jwt.sign(
+    payload,
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  );
 };
 
 exports.verifyToken = async (token) => {
-  return await jwtVerify(token, secret);
+  return jwt.verify(token, process.env.JWT_SECRET);
 };
