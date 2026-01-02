@@ -2,13 +2,11 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('users', 'name', {
-      type: Sequelize.STRING,
-      allowNull: true,
-    });
+    // This migration is now handled in the initial migration
+    // Column 'name' is added to users table in the initial migration
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('users', 'name');
+    // Rollback handled by initial migration
   }
 };

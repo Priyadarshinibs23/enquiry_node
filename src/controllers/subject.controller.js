@@ -1,11 +1,20 @@
 const { Subject } = require('../models');
+const { uploadImage, deleteImage, updateImage } = require('../utils/cloudinary');
 
 /**
- * CREATE Subject (ADMIN only)
+ * CREATE Subject (ADMIN and COUNSELLOR)
  */
 exports.createSubject = async (req, res) => {
   try {
-    const { name, code } = req.body;
+    const { name, code, startDate, overview, syllabus, prerequisites } = req.body;
+    const userRole = req.user.role;
+
+    // Only ADMIN and COUNSELLOR can create subjects
+    if (userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+      return res.status(403).json({
+        message: 'Access denied. Only Admin and Counsellor can create subjects',
+      });
+    }
 
     if (!name || !code) {
       return res.status(400).json({
@@ -13,7 +22,25 @@ exports.createSubject = async (req, res) => {
       });
     }
 
-    const subject = await Subject.create({ name, code });
+    let imageUrl = null;
+    let imagePublicId = null;
+
+    // Upload image if provided
+    if (req.file) {
+      const uploadResult = await uploadImage(req.file.buffer, `subject-${Date.now()}`);
+      imageUrl = uploadResult.secure_url;
+      imagePublicId = uploadResult.public_id;
+    }
+
+    const subject = await Subject.create({ 
+      name, 
+      code,
+      startDate: startDate || null,
+      image: imageUrl,
+      overview: overview ? JSON.parse(overview) : null,
+      syllabus: syllabus ? JSON.parse(syllabus) : null,
+      prerequisites: prerequisites ? JSON.parse(prerequisites) : null,
+    });
 
     res.status(201).json({
       message: 'Subject created successfully',
@@ -71,10 +98,19 @@ exports.getSubjectById = async (req, res) => {
 };
 
 /**
- * UPDATE subject (ADMIN only)
+ * UPDATE subject (ADMIN and COUNSELLOR)
  */
 exports.updateSubject = async (req, res) => {
   try {
+    const userRole = req.user.role;
+
+    // Only ADMIN and COUNSELLOR can update subjects
+    if (userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+      return res.status(403).json({
+        message: 'Access denied. Only Admin and Counsellor can update subjects',
+      });
+    }
+
     const subject = await Subject.findByPk(req.params.id);
 
     if (!subject) {
@@ -83,7 +119,30 @@ exports.updateSubject = async (req, res) => {
       });
     }
 
-    await subject.update(req.body);
+    const { name, code, startDate, overview, syllabus, prerequisites } = req.body;
+    let imageUrl = subject.image;
+
+    // Handle image update
+    if (req.file) {
+      // If old image exists, delete it and upload new one
+      if (subject.image) {
+        const publicId = subject.image.split('/').pop().split('.')[0];
+        await deleteImage(`enquiry_system/${publicId}`);
+      }
+
+      const uploadResult = await uploadImage(req.file.buffer, `subject-${Date.now()}`);
+      imageUrl = uploadResult.secure_url;
+    }
+
+    await subject.update({
+      name: name || subject.name,
+      code: code || subject.code,
+      startDate: startDate || subject.startDate,
+      image: imageUrl,
+      overview: overview ? JSON.parse(overview) : subject.overview,
+      syllabus: syllabus ? JSON.parse(syllabus) : subject.syllabus,
+      prerequisites: prerequisites ? JSON.parse(prerequisites) : subject.prerequisites,
+    });
 
     res.json({
       message: 'Subject updated successfully',
@@ -96,16 +155,31 @@ exports.updateSubject = async (req, res) => {
 };
 
 /**
- * DELETE subject (ADMIN only)
+ * DELETE subject (ADMIN and COUNSELLOR)
  */
 exports.deleteSubject = async (req, res) => {
   try {
+    const userRole = req.user.role;
+
+    // Only ADMIN and COUNSELLOR can delete subjects
+    if (userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+      return res.status(403).json({
+        message: 'Access denied. Only Admin and Counsellor can delete subjects',
+      });
+    }
+
     const subject = await Subject.findByPk(req.params.id);
 
     if (!subject) {
       return res.status(404).json({
         message: 'Subject not found',
       });
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (subject.image) {
+      const publicId = subject.image.split('/').pop().split('.')[0];
+      await deleteImage(`enquiry_system/${publicId}`);
     }
 
     await subject.destroy();

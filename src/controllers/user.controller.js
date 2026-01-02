@@ -15,6 +15,7 @@ exports.getUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
+        const userRole = req.user.role;
 
         const hashed = await hashPassword(password);
 
@@ -22,6 +23,13 @@ exports.createUser = async (req, res) => {
 
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // If creating an instructor, only ADMIN and COUNSELLOR can do it
+        if (role === 'instructor') {
+            if (userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+                return res.status(403).json({ message: 'Access denied. Only Admin and Counsellor can create instructors' });
+            }
         }
 
         const existingadmin = await User.findOne({ where: { role: 'ADMIN' } });

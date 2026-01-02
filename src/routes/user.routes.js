@@ -4,7 +4,7 @@ const role = require('../middlewares/role.middleware');
 const { createUser, changePassword, getUsers, deleteUser } = require('../controllers/user.controller');
 
 router.get('/', auth, role('ADMIN'), getUsers);
-router.post('/',auth, role('ADMIN'), createUser);
+router.post('/', auth, createUser);
 router.post('/change-password', auth, role('ADMIN'), changePassword);
 router.delete('/:id', auth, role('ADMIN'), deleteUser);
 module.exports = router;

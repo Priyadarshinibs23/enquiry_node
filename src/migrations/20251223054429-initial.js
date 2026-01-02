@@ -7,19 +7,24 @@ module.exports = {
     // USERS
     await queryInterface.createTable('users', {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      name: { type: Sequelize.STRING, allowNull: true },
       email: { type: Sequelize.STRING, allowNull: false, unique: true },
       password: { type: Sequelize.STRING, allowNull: false },
-      role: { type: Sequelize.ENUM('ADMIN', 'HR', 'COUNSELLOR', 'ACCOUNTS'), defaultValue: 'ADMIN' },
+      role: { type: Sequelize.ENUM('ADMIN', 'HR', 'COUNSELLOR', 'ACCOUNTS', 'instructor'), defaultValue: 'ADMIN' },
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE },
     });
-    await queryInterface.addConstraint('users', { fields: ['email'], type: 'unique', name: 'users_email_unique' });
 
     // SUBJECTS
     await queryInterface.createTable('subjects', {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: Sequelize.STRING, allowNull: false },
       code: { type: Sequelize.STRING, allowNull: true },
+      image: { type: Sequelize.STRING, allowNull: true },
+      overview: { type: Sequelize.JSON, allowNull: true },
+      syllabus: { type: Sequelize.JSON, allowNull: true },
+      prerequisites: { type: Sequelize.JSON, allowNull: true },
+      startDate: { type: Sequelize.DATE, allowNull: true },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
     });
@@ -29,14 +34,14 @@ module.exports = {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       name: Sequelize.STRING,
       code: Sequelize.STRING,
+      image: { type: Sequelize.STRING, allowNull: true },
+      overview: { type: Sequelize.JSON, allowNull: true },
+      syllabus: { type: Sequelize.JSON, allowNull: true },
+      prerequisites: { type: Sequelize.JSON, allowNull: true },
+      startDate: { type: Sequelize.DATE, allowNull: true },
+      subjectIds: { type: Sequelize.ARRAY(Sequelize.INTEGER), allowNull: true, defaultValue: [] },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE,
-    });
-    // subjectIds for packages
-    await queryInterface.addColumn('packages', 'subjectIds', {
-      type: Sequelize.ARRAY(Sequelize.INTEGER),
-      allowNull: true,
-      defaultValue: [],
     });
 
     // ENQUIRIES
@@ -149,12 +154,10 @@ module.exports = {
     await queryInterface.removeConstraint('enquiries', 'enquiries_email_unique');
     await queryInterface.removeConstraint('enquiries', 'enquiries_phone_unique');
     await queryInterface.dropTable('enquiries');
-    await queryInterface.removeColumn('packages', 'subjectIds');
     await queryInterface.dropTable('packages');
     await queryInterface.dropTable('subjects');
-    await queryInterface.removeConstraint('users', 'users_email_unique');
     await queryInterface.dropTable('users');
-    // Remove ENUM type if exists (Postgres)
+    // Remove ENUM types if exist (Postgres)
     await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_enquiries_candidateStatus";').catch(() => {});
   }
 };

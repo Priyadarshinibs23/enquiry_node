@@ -12,7 +12,7 @@ exports.createEnquiry = async (req, res) => {
       return res.status(400).json({ message: 'Email and phone are required' });
     }
 
-    const existing = await Enquiry.findOne({
+    const existing = await Enquiry.findOne({ 
       where: {
         [Op.or]: [
           { email },
