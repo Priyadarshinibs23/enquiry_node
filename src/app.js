@@ -9,6 +9,23 @@ app.use(cors({
 
 app.use(express.json());
 
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Enquiry API Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'API is healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/packages', require('./routes/package.routes'));
@@ -25,5 +42,14 @@ app.use('/api/billings', require('./routes/billing.routes'));
 app.use('/api/materials', require('./routes/material.routes'));
 app.use('/api/feedbacks', require('./routes/feedback.routes'));
 app.use('/api/batch-content', require('./routes/batchContent.routes'));
-                                                                                                   
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Route not found',
+    path: req.path
+  });
+});
+
 module.exports = app;
