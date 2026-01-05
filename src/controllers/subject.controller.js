@@ -58,6 +58,7 @@ exports.createSubject = async (req, res) => {
 exports.getAllSubjects = async (req, res) => {
   try {
     const subjects = await Subject.findAll({
+      attributes: ['id', 'name', 'code', 'image', 'overview', 'syllabus', 'prerequisites', 'startDate', 'createdAt', 'updatedAt'],
       include: {
         model: require('../models').Package,
         attributes: ['id', 'name', 'code'],
@@ -77,6 +78,7 @@ exports.getAllSubjects = async (req, res) => {
 exports.getSubjectById = async (req, res) => {
   try {
     const subject = await Subject.findByPk(req.params.id, {
+      attributes: ['id', 'name', 'code', 'image', 'overview', 'syllabus', 'prerequisites', 'startDate', 'createdAt', 'updatedAt'],
       include: {
         model: require('../models').Package,
         attributes: ['id', 'name', 'code'],
