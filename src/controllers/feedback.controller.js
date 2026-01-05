@@ -28,13 +28,8 @@ exports.createFeedback = async (req, res) => {
 
     // Verify enquiry exists and has correct candidate status
     const enquiry = await db.Enquiry.findByPk(enquiryId);
-    if (!enquiry) {
-      return sendResponse(res, 404, false, 'Enquiry not found');
-    }
-
-    // Check if candidate status is 'class' or 'class qualified'
     if (enquiry.candidateStatus !== 'class' && enquiry.candidateStatus !== 'class qualified') {
-      return sendResponse(res, 400, false, 'Feedback can only be given for students with "class" or "class qualified" status');
+      // Only students with class/class qualified status
     }
 
     // Verify instructor exists

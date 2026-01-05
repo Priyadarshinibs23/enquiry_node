@@ -19,9 +19,11 @@ app.use('/api/assignments', require('./routes/assignment.routes'));
 app.use('/api/mock-interviews', require('./routes/mockInterview.routes'));
 app.use('/api/reviews', require('./routes/review.routes'));
 app.use('/api/enquiries', require('./routes/enquiry.routes'));
+app.use('/api/enquiry-students', require('./routes/enquiryStudent.routes'));
 app.use('/api/logs', require('./routes/log.routes'));
 app.use('/api/billings', require('./routes/billing.routes'));
 app.use('/api/materials', require('./routes/material.routes'));
 app.use('/api/feedbacks', require('./routes/feedback.routes'));
+app.use('/api/batch-content', require('./routes/batchContent.routes'));
                                                                                                    
 module.exports = app;

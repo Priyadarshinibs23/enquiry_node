@@ -30,6 +30,8 @@ exports.createMaterial = async (req, res) => {
 
     // Check if instructor exists and is a valid user
     const instructor = await db.User.findByPk(instructorId);
+    // instructorId must be from User table
+
     if (!instructor) {
       return sendResponse(res, 404, false, 'Instructor not found');
     }

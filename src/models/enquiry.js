@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
                     key: 'id',
                 },
             },
+            batchId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'batches',
+                    key: 'id',
+                },
+            },
             subjectIds: {
                 type: DataTypes.ARRAY(DataTypes.INTEGER),
                 allowNull: true,

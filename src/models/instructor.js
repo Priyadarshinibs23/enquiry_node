@@ -4,10 +4,26 @@ module.exports = (sequelize, DataTypes) => {
     {
       userId: DataTypes.INTEGER,
       subjectId: DataTypes.INTEGER,
+      image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'Instructor profile image URL'
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'Instructor display name'
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: 'Instructor bio/description'
+      }
     },
     {
       tableName: 'instructors',
       freezeTableName: true,
+      timestamps: true
     }
   );
 };

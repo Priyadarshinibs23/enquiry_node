@@ -1,0 +1,1597 @@
+{
+  "info": {
+    "name": "Enquiry Node Academy API",
+    "description": "Complete API collection for the Enquiry Node Academy Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"instructor\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"JavaScript\",\n  \"code\": \"JS101\",\n  \"overview\": \"Learn JavaScript basics\",\n  \"startDate\": \"2026-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"]
+            }
+          }
+        },
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"]
+            }
+          }
+        },
+        {
+          "name": "Get Subject by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Subject",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Advanced JavaScript\",\n  \"overview\": \"Learn advanced JavaScript concepts\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Packages",
+      "item": [
+        {
+          "name": "Create Package",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Full Stack Development\",\n  \"code\": \"FSD101\",\n  \"price\": 50000,\n  \"duration\": \"3 months\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/packages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "packages"]
+            }
+          }
+        },
+        {
+          "name": "Get All Packages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/packages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "packages"]
+            }
+          }
+        },
+        {
+          "name": "Get Package by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/packages/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "packages", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Package",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 55000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/packages/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "packages", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Package",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/packages/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "packages", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Batches",
+      "item": [
+        {
+          "name": "Create Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Batch A - Jan 2026\",\n  \"code\": \"BA-JAN-2026\",\n  \"sessionDate\": \"2026-01-15\",\n  \"sessionTime\": \"10:00\",\n  \"subjectId\": 1,\n  \"status\": \"yet to start\",\n  \"numberOfStudents\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/batches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches"]
+            }
+          }
+        },
+        {
+          "name": "Get All Batches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/batches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches"]
+            }
+          }
+        },
+        {
+          "name": "Get Batch by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/batches/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Batch",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In progress\",\n  \"numberOfStudents\": 35\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/batches/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Batch",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/batches/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Batches by Subject",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/batches/subject/:subjectId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "batches", "subject", ":subjectId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enquiries",
+      "item": [
+        {
+          "name": "Create Enquiry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Kumar\",\n  \"email\": \"rahul@example.com\",\n  \"phone\": \"9876543210\",\n  \"current_location\": \"Mumbai\",\n  \"packageId\": 1,\n  \"trainingMode\": \"Online\",\n  \"trainingTime\": \"Evening\",\n  \"candidateStatus\": \"demo\",\n  \"profession\": \"Software Developer\",\n  \"qualification\": \"B.Tech\",\n  \"experience\": \"2 years\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries"]
+            }
+          }
+        },
+        {
+          "name": "Get All Enquiries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries"]
+            }
+          }
+        },
+        {
+          "name": "Get Enquiry by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Enquiry",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateStatus\": \"class\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Enquiry",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Enquiries by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/enquiries/status/class",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enquiries", "status", "class"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Materials",
+      "item": [
+        {
+          "name": "Upload Material",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "JavaScript Basics",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Complete guide to JavaScript basics",
+                  "type": "text"
+                },
+                {
+                  "key": "subjectId",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "batchId",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "instructorId",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": "/path/to/file.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/materials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"]
+            }
+          }
+        },
+        {
+          "name": "Get All Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"]
+            }
+          }
+        },
+        {
+          "name": "Get Material by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Materials by Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Get Materials by Instructor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/instructor/:instructorId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "instructor", ":instructorId"]
+            }
+          }
+        },
+        {
+          "name": "Get Materials by Subject and Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/subject/:subjectId/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "subject", ":subjectId", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Update Material",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Advanced JavaScript\",\n  \"description\": \"Advanced JavaScript concepts\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Material",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feedbacks",
+      "item": [
+        {
+          "name": "Create Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enquiryId\": 1,\n  \"instructorId\": 2,\n  \"batchId\": 1,\n  \"feedbackText\": [\"Great teaching\", \"Good communication\"],\n  \"rating\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks"]
+            }
+          }
+        },
+        {
+          "name": "Get All Feedbacks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks"]
+            }
+          }
+        },
+        {
+          "name": "Get Feedback by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Feedbacks by Instructor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/instructor/:instructorId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "instructor", ":instructorId"]
+            }
+          }
+        },
+        {
+          "name": "Get Feedbacks by Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Get Feedbacks by Instructor and Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/instructor/:instructorId/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "instructor", ":instructorId", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Get Feedbacks by Enquiry",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/enquiry/:enquiryId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "enquiry", ":enquiryId"]
+            }
+          }
+        },
+        {
+          "name": "Get Eligible Students for Feedback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/batch/:batchId/eligible-students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "batch", ":batchId", "eligible-students"]
+            }
+          }
+        },
+        {
+          "name": "Get Instructor Feedback Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/stats/instructor/:instructorId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", "stats", "instructor", ":instructorId"]
+            }
+          }
+        },
+        {
+          "name": "Update Feedback",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedbackText\": [\"Excellent teaching\", \"Clear explanations\"],\n  \"rating\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/feedbacks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "feedbacks", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assignments",
+      "item": [
+        {
+          "name": "Create Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"JavaScript Assignment 1\",\n  \"description\": \"Complete the given tasks\",\n  \"subjectId\": 1,\n  \"batchId\": 1,\n  \"dueDate\": \"2026-01-30\",\n  \"totalMarks\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments"]
+            }
+          }
+        },
+        {
+          "name": "Get All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments"]
+            }
+          }
+        },
+        {
+          "name": "Get Assignment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Assignments by Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Get Assignments by Instructor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/instructor/:instructorId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments", "instructor", ":instructorId"]
+            }
+          }
+        },
+        {
+          "name": "Update Assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Assignment\",\n  \"dueDate\": \"2026-02-05\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/assignments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "assignments", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mock Interviews",
+      "item": [
+        {
+          "name": "Create Mock Interview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enquiryId\": 1,\n  \"batchId\": 1,\n  \"instructorId\": 2,\n  \"interviewDate\": \"2026-01-25\",\n  \"interviewTime\": \"14:00\",\n  \"status\": \"scheduled\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews"]
+            }
+          }
+        },
+        {
+          "name": "Get All Mock Interviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Mock Interview by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Mock Interviews by Batch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews/batch/:batchId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews", "batch", ":batchId"]
+            }
+          }
+        },
+        {
+          "name": "Update Mock Interview",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"feedback\": \"Good performance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Mock Interview",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/mock-interviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "mock-interviews", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"reviewText\": \"Great course\",\n  \"subjectId\": 1,\n  \"packageId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get All Reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"reviewText\": \"Good course\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Instructors",
+      "item": [
+        {
+          "name": "Get All Instructors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/instructors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "instructors"]
+            }
+          }
+        },
+        {
+          "name": "Get Instructor by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/instructors/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "instructors", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Instructors by Subject",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/instructors/subject/:subjectId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "instructors", "subject", ":subjectId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Billings",
+      "item": [
+        {
+          "name": "Create Billing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enquiryId\": 1,\n  \"amount\": 50000,\n  \"paymentStatus\": \"pending\",\n  \"paymentDate\": \"2026-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/billings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billings"]
+            }
+          }
+        },
+        {
+          "name": "Get All Billings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/billings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billings"]
+            }
+          }
+        },
+        {
+          "name": "Get Billing by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/billings/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billings", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Billing",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentStatus\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/billings/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billings", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Delete Billing",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/billings/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "billings", ":id"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Log by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Get Logs by User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs", "user", ":userId"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

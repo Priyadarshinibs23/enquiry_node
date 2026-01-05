@@ -25,4 +25,25 @@ router.get(
   instructorController.getSubjectDetail
 );
 
+// Get individual instructor profile with stats and details
+router.get(
+  '/profile/:instructorId',
+  auth,
+  instructorController.getInstructorProfile
+);
+
+// Get all instructors profiles with stats
+router.get(
+  '/all/profiles',
+  auth,
+  instructorController.getAllInstructorsProfiles
+);
+
+// Update instructor profile (name, description, image)
+router.put(
+  '/profile/:instructorId',
+  auth,
+  instructorController.updateInstructorProfile
+);
+
 module.exports = router;

@@ -6,8 +6,8 @@ const Batch = db.Batch;
 exports.createBatch = async (req, res) => {
   try {
     const { name, code, sessionDate, sessionTime, status, numberOfStudents, sessionLink, subjectId } = req.body;
-    const userId = req.user.id;
-    const userRole = req.user.role;
+    const userId = req.user.id;  // From authenticated User
+    const userRole = req.user.role;  // Role validation
 
     console.log('Create batch request:', { name, code, subjectId, userRole, userId });
 

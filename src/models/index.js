@@ -21,6 +21,7 @@ db.Assignment = require('./assignment')(sequelize, DataTypes);
 db.MockInterview = require('./mockInterview')(sequelize, DataTypes);
 db.Material = require('./material')(sequelize, DataTypes);
 db.Feedback = require('./feedback')(sequelize, DataTypes);
+db.Announcement = require('./announcement')(sequelize, DataTypes);
 
 
 // Many-to-many association between Package and Subject using join table 'PackageSubjects'
@@ -65,6 +66,16 @@ db.Subject.belongsToMany(db.User, {
 	otherKey: 'userId',
 });
 
+// One-to-one association between User and Instructor (profile)
+db.User.hasOne(db.Instructor, {
+	foreignKey: 'userId',
+	as: 'instructorProfile',
+});
+db.Instructor.belongsTo(db.User, {
+	foreignKey: 'userId',
+	as: 'user',
+});
+
 // One-to-many association between User and Batch
 db.User.hasMany(db.Batch, {
 	foreignKey: 'createdBy',
@@ -83,6 +94,26 @@ db.Subject.hasMany(db.Batch, {
 db.Batch.belongsTo(db.Subject, {
 	foreignKey: 'subjectId',
 	as: 'subject',
+});
+
+// One-to-many association between Batch and Enquiry (students)
+db.Batch.hasMany(db.Enquiry, {
+	foreignKey: 'batchId',
+	onDelete: 'SET NULL',
+});
+db.Enquiry.belongsTo(db.Batch, {
+	foreignKey: 'batchId',
+	as: 'batch',
+});
+
+// One-to-many association between Package and Enquiry
+db.Package.hasMany(db.Enquiry, {
+	foreignKey: 'packageId',
+	onDelete: 'SET NULL',
+});
+db.Enquiry.belongsTo(db.Package, {
+	foreignKey: 'packageId',
+	as: 'package',
 });
 
 // One-to-many association between Subject and Review
@@ -257,6 +288,28 @@ db.Batch.hasMany(db.Feedback, {
 db.Feedback.belongsTo(db.Batch, {
 	foreignKey: 'batchId',
 	as: 'batch',
+});
+
+// ONE-TO-MANY: Batch has many Announcements
+db.Batch.hasMany(db.Announcement, {
+	foreignKey: 'batchId',
+	onDelete: 'CASCADE',
+	as: 'announcements',
+});
+db.Announcement.belongsTo(db.Batch, {
+	foreignKey: 'batchId',
+	as: 'batch',
+});
+
+// ONE-TO-MANY: User (Instructor) creates many Announcements
+db.User.hasMany(db.Announcement, {
+	foreignKey: 'instructorId',
+	onDelete: 'CASCADE',
+	as: 'announcements',
+});
+db.Announcement.belongsTo(db.User, {
+	foreignKey: 'instructorId',
+	as: 'instructor',
 });
 
 module.exports = db;

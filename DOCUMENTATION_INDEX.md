@@ -1,11 +1,40 @@
-# 📚 Documentation Index: Enquiry-Assignment Relationship
+# 📚 Documentation Index - Complete Academy Management System
 
 ---
 
-## 🎯 Quick Links
+## 🎯 Quick Links - NEW FEATURES
+
+### For Student Classroom System (Latest)
+1. **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** ⭐ START HERE
+   - Quick facts and features
+   - All endpoints at a glance
+   - Validation rules
+   - Common errors
+
+2. **[COMPLETE_CLASSROOM_API.md](COMPLETE_CLASSROOM_API.md)**
+   - Full API documentation
+   - All endpoints with examples
+   - Request/response format
+   - Error handling
+
+3. **[TESTING_PAYLOADS.md](TESTING_PAYLOADS.md)**
+   - Real curl examples
+   - Request/response pairs
+   - Testing workflow
+   - Error cases
+
+4. **[IMPLEMENTATION_SUMMARY_CLASSROOM.md](IMPLEMENTATION_SUMMARY_CLASSROOM.md)**
+   - What was implemented
+   - Architecture details
+   - Database schema
+   - Testing checklist
+
+---
+
+## 📚 Original Documentation
 
 ### For Quick Understanding
-1. **[QUICK_REFERENCE_ENQUIRY_ASSIGNMENT.md](QUICK_REFERENCE_ENQUIRY_ASSIGNMENT.md)** ⭐ START HERE
+1. **[QUICK_REFERENCE_ENQUIRY_ASSIGNMENT.md](QUICK_REFERENCE_ENQUIRY_ASSIGNMENT.md)**
    - 2-minute read
    - API quick reference
    - Key points summary
