@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('feedbacks', {
       id: {
         type: Sequelize.INTEGER,
@@ -12,32 +12,20 @@ module.exports = {
       enquiryId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'enquiries',
-          key: 'id',
-        },
+        references: { model: 'enquiries', key: 'id' },
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
       },
       instructorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
+        references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
       },
       batchId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'batches',
-          key: 'id',
-        },
+        references: { model: 'batches', key: 'id' },
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
       },
       feedbackText: {
         type: Sequelize.ARRAY(Sequelize.TEXT),
@@ -55,23 +43,17 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
-
-    // Add indexes for better query performance
-    await queryInterface.addIndex('feedbacks', ['enquiryId']);
-    await queryInterface.addIndex('feedbacks', ['instructorId']);
-    await queryInterface.addIndex('feedbacks', ['batchId']);
-    await queryInterface.addIndex('feedbacks', ['instructorId', 'batchId']);
   },
 
-  async down(queryInterface, Sequelize) {
+  down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('feedbacks');
   },
 };

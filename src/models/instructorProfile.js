@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define(
-    'Instructor',
+    'InstructorProfile',
     {
       userId: DataTypes.INTEGER,
       subjectId: DataTypes.INTEGER,
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      tableName: 'instructors',
+      tableName: 'instructorsProfile',
       freezeTableName: true,
       timestamps: true
     }

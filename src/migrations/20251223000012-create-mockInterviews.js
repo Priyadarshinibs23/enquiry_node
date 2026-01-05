@@ -1,61 +1,63 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
-    'MockInterview',
-    {
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('mockInterviews', {
       id: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
       },
       batchId: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'batches', key: 'id' },
         onDelete: 'CASCADE',
       },
       enquiryId: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'enquiries', key: 'id' },
         onDelete: 'CASCADE',
       },
       instructorId: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
       },
       interviewDate: {
-        type: DataTypes.DATE,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       interviewTime: {
-        type: DataTypes.TIME,
+        type: Sequelize.TIME,
         allowNull: false,
       },
       mode: {
-        type: DataTypes.ENUM('online', 'offline'),
+        type: Sequelize.ENUM('online', 'offline'),
         allowNull: false,
       },
       interviewLink: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       documentUpload: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM('scheduled', 'attended', 'not-attended', 'cancelled'),
+        type: Sequelize.ENUM('scheduled', 'attended', 'not-attended', 'cancelled'),
         defaultValue: 'scheduled',
         allowNull: false,
       },
       feedback: {
-        type: DataTypes.TEXT,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       score: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         allowNull: true,
         validate: {
           min: 0,
@@ -63,21 +65,23 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       outOf: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
         defaultValue: 10,
       },
       createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    },
-    {
-      tableName: 'mockInterviews',
-      timestamps: true,
-    }
-  );
+    });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('mockInterviews');
+  },
 };

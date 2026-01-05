@@ -4,10 +4,10 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('announcements', {
       id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
       },
       title: {
         type: Sequelize.STRING,
@@ -24,32 +24,30 @@ module.exports = {
       batchId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'batches',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
+        references: { model: 'batches', key: 'id' },
+        onDelete: 'CASCADE',
+      },
+      subjectId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: 'subjects', key: 'id' },
         onDelete: 'CASCADE',
       },
       instructorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
+        references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },

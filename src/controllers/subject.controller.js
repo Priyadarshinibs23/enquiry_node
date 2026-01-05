@@ -1,18 +1,17 @@
 const { Subject } = require('../models');
 const { uploadImage, deleteImage, updateImage } = require('../utils/cloudinary');
 
-// Helper function to safely parse JSON
-const safeJsonParse = (value) => {
-  if (!value) return null;
-  if (typeof value === 'object') return value;
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value);
-    } catch (e) {
-      return null;
-    }
+/**
+ * Helper function to safely parse JSON strings
+ */
+const safeJsonParse = (data) => {
+  if (!data) return null;
+  if (typeof data === 'object') return data;
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return data;
   }
-  return null;
 };
 
 /**

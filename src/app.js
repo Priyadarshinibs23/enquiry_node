@@ -59,6 +59,7 @@ app.use('/api/subjects', require('./routes/subject.routes'));
 app.use('/api/instructors', require('./routes/instructor.routes'));
 app.use('/api/batches', require('./routes/batch.routes'));
 app.use('/api/assignments', require('./routes/assignment.routes'));
+app.use('/api/assignment-responses', require('./routes/assignmentresponse.routes'));
 app.use('/api/mock-interviews', require('./routes/mockInterview.routes'));
 app.use('/api/reviews', require('./routes/review.routes'));
 app.use('/api/enquiries', require('./routes/enquiry.routes'));

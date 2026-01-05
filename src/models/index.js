@@ -16,12 +16,14 @@ db.Enquiry = require('./enquiry')(sequelize, DataTypes);
 db.Log = require('./log')(sequelize, DataTypes);
 db.Billing = require('./billing')(sequelize, DataTypes);
 db.Review = require('./review')(sequelize, DataTypes);
-db.Instructor = require('./instructor')(sequelize, DataTypes);
+db.Instructor = require('./instructorProfile')(sequelize, DataTypes);
 db.Assignment = require('./assignment')(sequelize, DataTypes);
+db.AssignmentResponse = require('./assignmentresponse')(sequelize, DataTypes);
 db.MockInterview = require('./mockInterview')(sequelize, DataTypes);
 db.Material = require('./material')(sequelize, DataTypes);
 db.Feedback = require('./feedback')(sequelize, DataTypes);
 db.Announcement = require('./announcement')(sequelize, DataTypes);
+db.BatchStudent = require('./batchstudent')(sequelize, DataTypes);
 
 
 // Many-to-many association between Package and Subject using join table 'PackageSubjects'
@@ -310,6 +312,50 @@ db.User.hasMany(db.Announcement, {
 db.Announcement.belongsTo(db.User, {
 	foreignKey: 'instructorId',
 	as: 'instructor',
+});
+
+// ONE-TO-MANY: Assignment has many AssignmentResponses
+db.Assignment.hasMany(db.AssignmentResponse, {
+	foreignKey: 'assignmentId',
+	onDelete: 'CASCADE',
+	as: 'responses',
+});
+db.AssignmentResponse.belongsTo(db.Assignment, {
+	foreignKey: 'assignmentId',
+	as: 'assignment',
+});
+
+// ONE-TO-MANY: Batch has many AssignmentResponses
+db.Batch.hasMany(db.AssignmentResponse, {
+	foreignKey: 'batchId',
+	onDelete: 'CASCADE',
+	as: 'assignmentResponses',
+});
+db.AssignmentResponse.belongsTo(db.Batch, {
+	foreignKey: 'batchId',
+	as: 'batch',
+});
+
+// ONE-TO-MANY: Enquiry has many AssignmentResponses
+db.Enquiry.hasMany(db.AssignmentResponse, {
+	foreignKey: 'enquiryId',
+	onDelete: 'CASCADE',
+	as: 'assignmentResponses',
+});
+db.AssignmentResponse.belongsTo(db.Enquiry, {
+	foreignKey: 'enquiryId',
+	as: 'enquiry',
+});
+
+// ONE-TO-MANY: User (Reviewer) reviews many AssignmentResponses
+db.User.hasMany(db.AssignmentResponse, {
+	foreignKey: 'reviewedBy',
+	onDelete: 'SET NULL',
+	as: 'reviewedAssignmentResponses',
+});
+db.AssignmentResponse.belongsTo(db.User, {
+	foreignKey: 'reviewedBy',
+	as: 'reviewer',
 });
 
 module.exports = db;
