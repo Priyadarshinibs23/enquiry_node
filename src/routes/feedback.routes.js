@@ -7,79 +7,79 @@ const roleMiddleware = require('../middlewares/role.middleware');
 // Create feedback (students give feedback)
 router.post(
   '/',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.createFeedback
 );
 
 // Get all feedbacks (admin only)
 router.get(
   '/',
-  authMiddleware.authenticate,
-  roleMiddleware.authorize('admin'),
+  authMiddleware,
+  roleMiddleware('admin'),
   feedbackController.getAllFeedbacks
 );
 
 // Get feedback by ID
 router.get(
   '/:id',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getFeedbackById
 );
 
 // Get feedbacks for a specific instructor
 router.get(
   '/instructor/:instructorId',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getFeedbacksForInstructor
 );
 
 // Get feedbacks by batch
 router.get(
   '/batch/:batchId',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getFeedbacksByBatch
 );
 
 // Get feedbacks for instructor in a specific batch
 router.get(
   '/instructor/:instructorId/batch/:batchId',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getFeedbacksByInstructorAndBatch
 );
 
 // Get eligible students for feedback in a batch
 router.get(
   '/batch/:batchId/eligible-students',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getEligibleStudentsForBatch
 );
 
 // Get feedbacks given by an enquiry
 router.get(
   '/enquiry/:enquiryId',
-  authMiddleware.authenticate,
-  feedbackController.getFeedbacksByEnquiry
+  authMiddleware,
+  feedbackController.getFeedbacksByStudent
 );
 
 // Get instructor feedback statistics
 router.get(
   '/stats/instructor/:instructorId',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.getInstructorFeedbackStats
 );
 
 // Update feedback
 router.put(
   '/:id',
-  authMiddleware.authenticate,
+  authMiddleware,
   feedbackController.updateFeedback
 );
 
 // Delete feedback
 router.delete(
   '/:id',
-  authMiddleware.authenticate,
-  roleMiddleware.authorize('admin'),
+  authMiddleware,
+  roleMiddleware('admin'),
   feedbackController.deleteFeedback
 );
 

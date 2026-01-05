@@ -1,6 +1,20 @@
 const { Subject } = require('../models');
 const { uploadImage, deleteImage, updateImage } = require('../utils/cloudinary');
 
+// Helper function to safely parse JSON
+const safeJsonParse = (value) => {
+  if (!value) return null;
+  if (typeof value === 'object') return value;
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+};
+
 /**
  * CREATE Subject (ADMIN and COUNSELLOR)
  */
@@ -37,9 +51,9 @@ exports.createSubject = async (req, res) => {
       code,
       startDate: startDate || null,
       image: imageUrl,
-      overview: overview ? JSON.parse(overview) : null,
-      syllabus: syllabus ? JSON.parse(syllabus) : null,
-      prerequisites: prerequisites ? JSON.parse(prerequisites) : null,
+      overview: safeJsonParse(overview),
+      syllabus: safeJsonParse(syllabus),
+      prerequisites: safeJsonParse(prerequisites),
     });
 
     res.status(201).json({
@@ -141,9 +155,9 @@ exports.updateSubject = async (req, res) => {
       code: code || subject.code,
       startDate: startDate || subject.startDate,
       image: imageUrl,
-      overview: overview ? JSON.parse(overview) : subject.overview,
-      syllabus: syllabus ? JSON.parse(syllabus) : subject.syllabus,
-      prerequisites: prerequisites ? JSON.parse(prerequisites) : subject.prerequisites,
+      overview: overview !== undefined ? safeJsonParse(overview) : subject.overview,
+      syllabus: syllabus !== undefined ? safeJsonParse(syllabus) : subject.syllabus,
+      prerequisites: prerequisites !== undefined ? safeJsonParse(prerequisites) : subject.prerequisites,
     });
 
     res.json({

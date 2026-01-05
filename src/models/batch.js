@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       batchStartDate: DataTypes.DATE,
       sessionLink: DataTypes.STRING,
       sessionDate: DataTypes.DATE,
-      sessionTime: DataTypes.TIME,
+      sessionTime: DataTypes.STRING,
       numberOfStudents: {
         type: DataTypes.INTEGER,
         allowNull: true,
