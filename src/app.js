@@ -22,8 +22,34 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'API is healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    nodeEnv: process.env.NODE_ENV,
+    nodeVersion: process.version
   });
+});
+
+app.get('/api/debug', async (req, res) => {
+  try {
+    const { sequelize } = require('./models');
+    
+    // Test database connection
+    await sequelize.authenticate();
+    
+    res.status(200).json({
+      status: 'success',
+      database: 'connected',
+      nodeEnv: process.env.NODE_ENV,
+      nodeVersion: process.version,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      database: 'disconnected',
+      error: error.message,
+      nodeEnv: process.env.NODE_ENV
+    });
+  }
 });
 
 app.use('/api/auth', require('./routes/auth.routes'));
