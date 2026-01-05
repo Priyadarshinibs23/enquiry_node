@@ -4,12 +4,10 @@
     "NODE_ENV": "production"
   },
   "buildCommand": "npm install",
-  "functions": {
-    "src/server.js": {
-      "memory": 1024,
-      "maxDuration": 60,
-      "includeFiles": "node_modules/pg/**",
-      "includeFiles": "node_modules/pg-hstore/**"
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
     }
-  }
+  ]
 }
