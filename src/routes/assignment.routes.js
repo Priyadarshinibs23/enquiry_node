@@ -10,23 +10,16 @@ router.post(
   assignmentController.createAssignment
 );
 
-// Get all assignments created by instructor or all (admin/counsellor)
+// Get Batches by Instructor ID and Subject ID
 router.get(
-  '/my-assignments',
-  auth,
-  assignmentController.getMyAssignments
+  '/batches-by-instructor-subject',
+  assignmentController.getBatchesByInstructorAndSubject
 );
 
 // Get Assignments for a Batch
 router.get(
   '/batch/:batchId',
   assignmentController.getAssignmentsByBatch
-);
-
-// Get Assignments for a Subject
-router.get(
-  '/subject/:subjectId',
-  assignmentController.getAssignmentsBySubject
 );
 
 // Get Single Assignment
@@ -55,26 +48,3 @@ router.post(
   auth,
   assignmentController.submitAssignmentWork
 );
-
-// Review assignment (instructor reviews and comments)
-router.post(
-  '/:assignmentId/review',
-  auth,
-  assignmentController.reviewAssignmentSubmission
-);
-
-// Get submissions pending review
-router.get(
-  '/submissions/pending-review',
-  auth,
-  assignmentController.getSubmissionsPendingReview
-);
-
-// Get reviewed assignments
-router.get(
-  '/submissions/reviewed',
-  auth,
-  assignmentController.getReviewedAssignments
-);
-
-module.exports = router;

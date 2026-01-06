@@ -14,6 +14,24 @@ router.post(
 );
 
 /**
+ * READ - Get instructor comments by assignment ID
+ * GET /api/assignment-responses/:assignmentId/comments
+ */
+router.get(
+  '/:assignmentId/comments',
+  assignmentResponseController.getInstructorCommentsByAssignment
+);
+
+/**
+ * READ - Get assignment responses by batchId and subjectId
+ * GET /api/assignment-responses/batch-subject
+ */
+router.get(
+  '/batch-subject',
+  assignmentResponseController.getAssignmentResponsesByBatchAndSubject
+);
+
+/**
  * READ - Instructor view: Get all submissions for an assignment
  * GET /api/assignment-responses/instructor/submissions/:assignmentId
  */

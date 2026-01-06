@@ -204,50 +204,112 @@ exports.updateAssignmentResponse = async (req, res) => {
     const userId = req.user.id;
     const userRole = req.user.role;
 
+    // Only instructor, admin, or counsellor can review
+    if (userRole !== 'instructor' && userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only instructors, admin, or counsellor can review assignments',
+      });
+    }
+
     // Check if response exists
     const response = await AssignmentResponse.findByPk(id, {
       include: [
         {
           model: Assignment,
           as: 'assignment',
-          attributes: ['id', 'title'],
+          attributes: ['id', 'title', 'createdBy', 'batchId'],
+        },
+        {
+          model: Enquiry,
+          as: 'enquiry',
+          attributes: ['id', 'name', 'email'],
         },
       ],
     });
 
     if (!response) {
       return res.status(404).json({
+        success: false,
         message: 'Assignment response not found',
       });
     }
 
-    // Only admin, counsellor, or the instructor of the batch can review
+    // Check if instructor can review this assignment
     const batch = await Batch.findByPk(response.batchId);
-    if (
-      userRole === 'instructor' &&
-      batch.createdBy !== userId
-    ) {
+    if (userRole === 'instructor' && response.assignment.createdBy !== userId) {
       return res.status(403).json({
-        message: 'Access denied. You can only review assignments from your own batches.',
+        success: false,
+        message: 'Access denied. You can only review assignments you created.',
       });
     }
 
-    // Update response
-    await response.update({
-      status: status || response.status,
-      instructorComments: instructorComments || response.instructorComments,
+    // Validate status if provided
+    const validStatuses = ['assigned', 'submitted', 'reviewed'];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+      });
+    }
+
+    // Update response with review details
+    const updateData = {
+      status: status || 'reviewed',
       reviewedBy: userId,
       reviewedOn: new Date(),
+    };
+
+    // Add instructor comments if provided
+    if (instructorComments) {
+      updateData.instructorComments = instructorComments;
+    }
+
+    await response.update(updateData);
+
+    // Fetch updated response with reviewer info
+    const updatedResponse = await AssignmentResponse.findByPk(id, {
+      include: [
+        {
+          model: Assignment,
+          as: 'assignment',
+          attributes: ['id', 'title', 'description', 'dueDate'],
+        },
+        {
+          model: Enquiry,
+          as: 'enquiry',
+          attributes: ['id', 'name', 'email', 'candidateStatus'],
+        },
+        {
+          model: User,
+          as: 'reviewer',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
     });
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: 'Assignment reviewed successfully',
-      data: response,
+      message: 'Assignment reviewed successfully with comments added',
+      data: {
+        id: updatedResponse.id,
+        assignment: updatedResponse.assignment,
+        enquiry: updatedResponse.enquiry,
+        submissionNotes: updatedResponse.submissionNotes,
+        submissionFile: updatedResponse.submissionFile,
+        status: updatedResponse.status,
+        instructorComments: updatedResponse.instructorComments,
+        submittedOn: updatedResponse.submittedOn,
+        reviewer: updatedResponse.reviewer,
+        reviewedOn: updatedResponse.reviewedOn,
+      },
     });
   } catch (error) {
     console.error('Error in updateAssignmentResponse:', error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -295,5 +357,171 @@ exports.deleteAssignmentResponse = async (req, res) => {
   } catch (error) {
     console.error('Error in deleteAssignmentResponse:', error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * READ - Get assignment responses by batchId and subjectId
+ */
+exports.getAssignmentResponsesByBatchAndSubject = async (req, res) => {
+  try {
+    const { batchId, subjectId } = req.query;
+
+    // Validate required parameters
+    if (!batchId || !subjectId) {
+      return res.status(400).json({
+        success: false,
+        message: 'batchId and subjectId are required as query parameters',
+      });
+    }
+
+    // Check if batch exists
+    const batch = await Batch.findByPk(batchId);
+    if (!batch) {
+      return res.status(404).json({
+        success: false,
+        message: 'Batch not found',
+      });
+    }
+
+    // Get all assignments for the batch and subject
+    const assignments = await Assignment.findAll({
+      where: {
+        batchId: batchId,
+        subjectId: subjectId,
+      },
+      attributes: ['id'],
+    });
+
+    if (assignments.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No assignments found for this batch and subject',
+        total: 0,
+        data: [],
+      });
+    }
+
+    const assignmentIds = assignments.map(a => a.id);
+
+    // Get all assignment responses for these assignments
+    const responses = await AssignmentResponse.findAll({
+      where: {
+        assignmentId: assignmentIds,
+      },
+      include: [
+        {
+          model: Assignment,
+          attributes: ['id', 'title', 'description', 'dueDate', 'batchId'],
+          as: 'assignment',
+        },
+        {
+          model: Enquiry,
+          attributes: ['id', 'name', 'email', 'candidateStatus'],
+          as: 'enquiry',
+        },
+        {
+          model: User,
+          attributes: ['id', 'name', 'email'],
+          foreignKey: 'reviewedBy',
+          as: 'reviewer',
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Assignment responses retrieved successfully',
+      total: responses.length,
+      batchId: batchId,
+      subjectId: subjectId,
+      data: responses,
+    });
+  } catch (error) {
+    console.error('Error in getAssignmentResponsesByBatchAndSubject:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * READ - Get instructor comments by assignment ID
+ */
+exports.getInstructorCommentsByAssignment = async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+
+    // Validate required parameter
+    if (!assignmentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'assignmentId is required',
+      });
+    }
+
+    // Check if assignment exists
+    const assignment = await Assignment.findByPk(assignmentId, {
+      attributes: ['id', 'title', 'description', 'dueDate', 'batchId'],
+    });
+
+    if (!assignment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Assignment not found',
+      });
+    }
+
+    // Get all assignment responses with instructor comments for this assignment
+    const responses = await AssignmentResponse.findAll({
+      where: {
+        assignmentId: assignmentId,
+      },
+      attributes: ['id', 'assignmentId', 'enquiryId', 'submissionNotes', 'submissionFile', 'status', 'instructorComments', 'reviewedBy', 'reviewedOn', 'submittedOn'],
+      include: [
+        {
+          model: Enquiry,
+          attributes: ['id', 'name', 'email', 'candidateStatus'],
+          as: 'enquiry',
+        },
+        {
+          model: User,
+          attributes: ['id', 'name', 'email'],
+          foreignKey: 'reviewedBy',
+          as: 'reviewer',
+        },
+      ],
+      order: [['reviewedOn', 'DESC']],
+    });
+
+    // Filter only responses with instructor comments
+    const commentsData = responses.map(response => ({
+      id: response.id,
+      assignmentId: response.assignmentId,
+      enquiry: response.enquiry,
+      submissionNotes: response.submissionNotes,
+      submissionFile: response.submissionFile,
+      status: response.status,
+      instructorComments: response.instructorComments,
+      reviewer: response.reviewer,
+      reviewedOn: response.reviewedOn,
+      submittedOn: response.submittedOn,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: 'Instructor comments retrieved successfully',
+      assignment: assignment,
+      total: commentsData.filter(c => c.instructorComments).length,
+      data: commentsData,
+    });
+  } catch (error) {
+    console.error('Error in getInstructorCommentsByAssignment:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
