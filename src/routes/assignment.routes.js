@@ -42,9 +42,4 @@ router.delete(
   assignmentController.deleteAssignment
 );
 
-// Submit assignment (student submits their work)
-router.post(
-  '/:assignmentId/submit',
-  auth,
-  assignmentController.submitAssignmentWork
-);
+module.exports = router;
