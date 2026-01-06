@@ -24,6 +24,8 @@ db.Material = require('./material')(sequelize, DataTypes);
 db.Feedback = require('./feedback')(sequelize, DataTypes);
 db.Announcement = require('./announcement')(sequelize, DataTypes);
 db.BatchStudent = require('./batchstudent')(sequelize, DataTypes);
+db.ClassFeed = require('./classfeed')(sequelize, DataTypes);
+db.InstructorSubject = require('./instructorsubject')(sequelize, DataTypes);
 
 
 // Many-to-many association between Package and Subject using join table 'PackageSubjects'
@@ -356,6 +358,42 @@ db.User.hasMany(db.AssignmentResponse, {
 db.AssignmentResponse.belongsTo(db.User, {
 	foreignKey: 'reviewedBy',
 	as: 'reviewer',
+});
+
+// ONE-TO-MANY: Batch has many ClassFeeds
+db.Batch.hasMany(db.ClassFeed, {
+	foreignKey: 'batchId',
+	onDelete: 'CASCADE',
+	as: 'classfeeds',
+});
+db.ClassFeed.belongsTo(db.Batch, {
+	foreignKey: 'batchId',
+	as: 'batch',
+});
+
+// ONE-TO-MANY: Subject has many ClassFeeds
+db.Subject.hasMany(db.ClassFeed, {
+	foreignKey: 'subjectId',
+	onDelete: 'CASCADE',
+	as: 'classfeeds',
+});
+db.ClassFeed.belongsTo(db.Subject, {
+	foreignKey: 'subjectId',
+	as: 'subject',
+});
+
+// Many-to-many: Instructor teaches many Subjects
+db.User.belongsToMany(db.Subject, {
+	through: db.InstructorSubject,
+	foreignKey: 'instructorId',
+	otherKey: 'subjectId',
+	as: 'subjects',
+});
+db.Subject.belongsToMany(db.User, {
+	through: db.InstructorSubject,
+	foreignKey: 'subjectId',
+	otherKey: 'instructorId',
+	as: 'instructors',
 });
 
 module.exports = db;

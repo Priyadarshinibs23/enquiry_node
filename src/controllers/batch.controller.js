@@ -9,6 +9,14 @@ exports.createBatch = async (req, res) => {
     const userId = req.user.id;  // From authenticated User
     const userRole = req.user.role;  // Role validation
 
+    // Only ADMIN, COUNSELLOR, and INSTRUCTOR can create batches
+    if (userRole !== 'ADMIN' && userRole !== 'COUNSELLOR' && userRole !== 'instructor') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Only Admin, Counsellor, and Instructor can create batches.',
+      });
+    }
+
     console.log('Create batch request:', { name, code, subjectId, userRole, userId });
 
     if (!name || !code || !sessionDate || !sessionTime || !subjectId) {
@@ -26,8 +34,9 @@ exports.createBatch = async (req, res) => {
       });
     }
 
-    // For instructors: create with pending approval
-    // For admin/counsellor: create directly with approved status
+    // Set approval status based on user role
+    // Admin/Counsellor: approved by default
+    // Instructor: pending (needs approval)
     const approvalStatus = (userRole === 'ADMIN' || userRole === 'COUNSELLOR') ? 'approved' : 'pending';
 
     const batch = await Batch.create({
@@ -48,8 +57,9 @@ exports.createBatch = async (req, res) => {
     res.status(201).json({
       success: true,
       message: approvalStatus === 'pending' 
-        ? 'Batch created successfully and sent for approval' 
+        ? 'Batch created successfully. Awaiting approval from Admin/Counsellor.' 
         : 'Batch created successfully',
+      approvalStatus,
       data: batch,
     });
   } catch (error) {

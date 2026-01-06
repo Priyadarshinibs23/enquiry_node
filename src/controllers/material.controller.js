@@ -1,10 +1,27 @@
 const db = require('../models');
 const { sendResponse } = require('../utils/response');
+const { Formidable } = require('formidable');
+const fs = require('fs');
+const { uploadImage } = require('../utils/cloudinary');
 
 // Create a new material
 exports.createMaterial = async (req, res) => {
   try {
-    const { title, description, subjectId, batchId, instructorId } = req.body;
+    // Parse form data using formidable
+    const form = new Formidable({
+      multiples: false,
+      maxFileSize: 50 * 1024 * 1024, // 50MB limit for documents
+      keepExtensions: true
+    });
+
+    const [fields, files] = await form.parse(req);
+
+    // Extract field values
+    const title = fields.title ? fields.title[0] : null;
+    const description = fields.description ? fields.description[0] : null;
+    const subjectId = fields.subjectId ? fields.subjectId[0] : null;
+    const batchId = fields.batchId ? fields.batchId[0] : null;
+    const instructorId = fields.instructorId ? fields.instructorId[0] : null;
 
     // Validate required fields
     if (!title || !subjectId || !batchId || !instructorId) {
@@ -12,7 +29,7 @@ exports.createMaterial = async (req, res) => {
     }
 
     // Check if file was uploaded
-    if (!req.file) {
+    if (!files.document || files.document.length === 0) {
       return sendResponse(res, 400, false, 'Document file is required');
     }
 
@@ -30,11 +47,18 @@ exports.createMaterial = async (req, res) => {
 
     // Check if instructor exists and is a valid user
     const instructor = await db.User.findByPk(instructorId);
-    // instructorId must be from User table
 
     if (!instructor) {
       return sendResponse(res, 404, false, 'Instructor not found');
     }
+
+    // Upload document to cloudinary
+    let documentUrl = null;
+    const documentFile = files.document[0];
+    const fileBuffer = await fs.promises.readFile(documentFile.filepath);
+    const uploadResult = await uploadImage(fileBuffer, `material-${instructorId}-${Date.now()}`);
+    documentUrl = uploadResult.secure_url;
+    await fs.promises.unlink(documentFile.filepath).catch(() => {});
 
     // Create material
     const material = await db.Material.create({
@@ -43,8 +67,8 @@ exports.createMaterial = async (req, res) => {
       subjectId,
       batchId,
       instructorId,
-      documentUrl: req.file.path,
-      documentName: req.file.originalname,
+      documentUrl: documentUrl,
+      documentName: documentFile.originalFilename || documentFile.filename,
       uploadedOn: new Date(),
     });
 

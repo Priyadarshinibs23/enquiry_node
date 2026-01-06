@@ -69,6 +69,8 @@ app.use('/api/billings', require('./routes/billing.routes'));
 app.use('/api/materials', require('./routes/material.routes'));
 app.use('/api/feedbacks', require('./routes/feedback.routes'));
 app.use('/api/batch-content', require('./routes/batchContent.routes'));
+app.use('/api/classfeeds', require('./routes/classfeed.routes'));
+app.use('/api/instructor-subjects', require('./routes/instructorsubject.routes'));
 
 // 404 handler
 app.use((req, res) => {

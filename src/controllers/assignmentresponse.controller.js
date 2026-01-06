@@ -1,5 +1,7 @@
 const db = require('../models');
 const { uploadImage, deleteImage } = require('../utils/cloudinary');
+const { Formidable } = require('formidable');
+const fs = require('fs');
 
 const AssignmentResponse = db.AssignmentResponse;
 const Assignment = db.Assignment;
@@ -12,7 +14,21 @@ const User = db.User;
  */
 exports.createAssignmentResponse = async (req, res) => {
   try {
-    const { assignmentId, batchId, enquiryId, submissionNotes } = req.body;
+    // Parse form data using formidable
+    const form = new Formidable({
+      multiples: false,
+      maxFileSize: 10 * 1024 * 1024, // 10MB limit
+      keepExtensions: true
+    });
+
+    const [fields, files] = await form.parse(req);
+
+    // Extract field values
+    const assignmentId = fields.assignmentId ? fields.assignmentId[0] : null;
+    const batchId = fields.batchId ? fields.batchId[0] : null;
+    const enquiryId = fields.enquiryId ? fields.enquiryId[0] : null;
+    const submissionNotes = fields.submissionNotes ? fields.submissionNotes[0] : null;
+
     const userId = req.user.id;
 
     // Validate required fields
@@ -50,12 +66,15 @@ exports.createAssignmentResponse = async (req, res) => {
     }
 
     // Upload submission file if provided
-    if (req.file) {
+    if (files.submissionFile && files.submissionFile.length > 0) {
+      const fileUpload = files.submissionFile[0];
+      const fileBuffer = await fs.promises.readFile(fileUpload.filepath);
       const uploadResult = await uploadImage(
-        req.file.buffer,
+        fileBuffer,
         `assignment-response-${assignmentId}-${enquiryId || userId}-${Date.now()}`
       );
       submissionFile = uploadResult.secure_url;
+      await fs.promises.unlink(fileUpload.filepath).catch(() => {});
     }
 
     // Create assignment response
@@ -81,54 +100,45 @@ exports.createAssignmentResponse = async (req, res) => {
 };
 
 /**
- * GET all Assignment Responses (ADMIN, COUNSELLOR, INSTRUCTOR)
+ * GET - Instructor views all submissions for their assignment
+ * GET /api/assignment-responses/instructor/submissions/:assignmentId
  */
-exports.getAllAssignmentResponses = async (req, res) => {
+exports.getInstructorAssignmentSubmissions = async (req, res) => {
   try {
-    const responses = await AssignmentResponse.findAll({
+    const { assignmentId } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    // Check if assignment exists
+    const assignment = await Assignment.findByPk(assignmentId, {
       include: [
-        {
-          model: Assignment,
-          as: 'assignment',
-          attributes: ['id', 'title', 'dueDate'],
-        },
         {
           model: Batch,
           as: 'batch',
-          attributes: ['id', 'name', 'code'],
-        },
-        {
-          model: Enquiry,
-          as: 'enquiry',
-          attributes: ['id', 'name', 'email'],
-        },
-        {
-          model: User,
-          as: 'reviewer',
-          attributes: ['id', 'name', 'email'],
+          attributes: ['id', 'name', 'code', 'createdBy'],
         },
       ],
-      order: [['createdAt', 'DESC']],
     });
 
-    res.json({
-      success: true,
-      data: responses,
-    });
-  } catch (error) {
-    console.error('Error in getAllAssignmentResponses:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
+    if (!assignment) {
+      return res.status(404).json({
+        message: 'Assignment not found',
+      });
+    }
 
-/**
- * GET Assignment Response by ID
- */
-exports.getAssignmentResponseById = async (req, res) => {
-  try {
-    const { id } = req.params;
+    // Only the instructor who created the assignment or admin/counsellor can view submissions
+    if (
+      userRole === 'instructor' &&
+      assignment.createdBy !== userId
+    ) {
+      return res.status(403).json({
+        message: 'Access denied. You can only view submissions for your own assignments.',
+      });
+    }
 
-    const response = await AssignmentResponse.findByPk(id, {
+    // Get all submissions for this assignment
+    const submissions = await AssignmentResponse.findAll({
+      where: { assignmentId },
       include: [
         {
           model: Assignment,
@@ -136,152 +146,11 @@ exports.getAssignmentResponseById = async (req, res) => {
           attributes: ['id', 'title', 'description', 'dueDate'],
         },
         {
-          model: Batch,
-          as: 'batch',
-          attributes: ['id', 'name', 'code'],
-        },
-        {
           model: Enquiry,
           as: 'enquiry',
           attributes: ['id', 'name', 'email', 'phone'],
         },
         {
-          model: User,
-          as: 'reviewer',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
-    });
-
-    if (!response) {
-      return res.status(404).json({
-        message: 'Assignment response not found',
-      });
-    }
-
-    res.json({
-      success: true,
-      data: response,
-    });
-  } catch (error) {
-    console.error('Error in getAssignmentResponseById:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-/**
- * GET Assignment Responses by Assignment ID
- */
-exports.getAssignmentResponsesByAssignment = async (req, res) => {
-  try {
-    const { assignmentId } = req.params;
-
-    // Check if assignment exists
-    const assignment = await Assignment.findByPk(assignmentId);
-    if (!assignment) {
-      return res.status(404).json({
-        message: 'Assignment not found',
-      });
-    }
-
-    const responses = await AssignmentResponse.findAll({
-      where: { assignmentId },
-      include: [
-        {
-          model: Enquiry,
-          as: 'enquiry',
-          attributes: ['id', 'name', 'email'],
-        },
-        {
-          model: User,
-          as: 'reviewer',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
-      order: [['submittedOn', 'DESC']],
-    });
-
-    res.json({
-      success: true,
-      data: responses,
-    });
-  } catch (error) {
-    console.error('Error in getAssignmentResponsesByAssignment:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-/**
- * GET Assignment Responses by Batch ID
- */
-exports.getAssignmentResponsesByBatch = async (req, res) => {
-  try {
-    const { batchId } = req.params;
-
-    // Check if batch exists
-    const batch = await Batch.findByPk(batchId);
-    if (!batch) {
-      return res.status(404).json({
-        message: 'Batch not found',
-      });
-    }
-
-    const responses = await AssignmentResponse.findAll({
-      where: { batchId },
-      include: [
-        {
-          model: Assignment,
-          as: 'assignment',
-          attributes: ['id', 'title', 'dueDate'],
-        },
-        {
-          model: Enquiry,
-          as: 'enquiry',
-          attributes: ['id', 'name', 'email'],
-        },
-        {
-          model: User,
-          as: 'reviewer',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-
-    res.json({
-      success: true,
-      data: responses,
-    });
-  } catch (error) {
-    console.error('Error in getAssignmentResponsesByBatch:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-/**
- * GET Assignment Responses by Enquiry ID
- */
-exports.getAssignmentResponsesByEnquiry = async (req, res) => {
-  try {
-    const { enquiryId } = req.params;
-
-    // Check if enquiry exists
-    const enquiry = await Enquiry.findByPk(enquiryId);
-    if (!enquiry) {
-      return res.status(404).json({
-        message: 'Enquiry not found',
-      });
-    }
-
-    const responses = await AssignmentResponse.findAll({
-      where: { enquiryId },
-      include: [
-        {
-          model: Assignment,
-          as: 'assignment',
-          attributes: ['id', 'title', 'dueDate'],
-        },
-        {
           model: Batch,
           as: 'batch',
           attributes: ['id', 'name', 'code'],
@@ -295,18 +164,38 @@ exports.getAssignmentResponsesByEnquiry = async (req, res) => {
       order: [['submittedOn', 'DESC']],
     });
 
+    // Summary statistics
+    const totalSubmissions = submissions.length;
+    const submittedCount = submissions.filter(s => s.status === 'submitted').length;
+    const reviewedCount = submissions.filter(s => s.status === 'reviewed').length;
+    const pendingCount = submissions.filter(s => s.status === 'pending').length;
+
     res.json({
       success: true,
-      data: responses,
+      message: 'Assignment submissions retrieved successfully',
+      assignment: {
+        id: assignment.id,
+        title: assignment.title,
+        dueDate: assignment.dueDate,
+        batch: assignment.batch,
+      },
+      statistics: {
+        total: totalSubmissions,
+        submitted: submittedCount,
+        reviewed: reviewedCount,
+        pending: pendingCount,
+      },
+      submissions: submissions,
     });
   } catch (error) {
-    console.error('Error in getAssignmentResponsesByEnquiry:', error);
+    console.error('Error in getInstructorAssignmentSubmissions:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
 /**
- * UPDATE Assignment Response (INSTRUCTOR - REVIEW)
+ * UPDATE - Instructor reviews/grades student assignment
+ * PUT /api/assignment-responses/:id
  */
 exports.updateAssignmentResponse = async (req, res) => {
   try {
@@ -316,7 +205,16 @@ exports.updateAssignmentResponse = async (req, res) => {
     const userRole = req.user.role;
 
     // Check if response exists
-    const response = await AssignmentResponse.findByPk(id);
+    const response = await AssignmentResponse.findByPk(id, {
+      include: [
+        {
+          model: Assignment,
+          as: 'assignment',
+          attributes: ['id', 'title'],
+        },
+      ],
+    });
+
     if (!response) {
       return res.status(404).json({
         message: 'Assignment response not found',
@@ -344,7 +242,7 @@ exports.updateAssignmentResponse = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Assignment response updated successfully',
+      message: 'Assignment reviewed successfully',
       data: response,
     });
   } catch (error) {
@@ -354,7 +252,8 @@ exports.updateAssignmentResponse = async (req, res) => {
 };
 
 /**
- * DELETE Assignment Response
+ * DELETE - Delete assignment response
+ * DELETE /api/assignment-responses/:id
  */
 exports.deleteAssignmentResponse = async (req, res) => {
   try {
