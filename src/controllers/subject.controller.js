@@ -1,5 +1,7 @@
 const { Subject } = require('../models');
 const { uploadImage, deleteImage, updateImage } = require('../utils/cloudinary');
+const { Formidable } = require('formidable');
+const fs = require('fs');
 
 /**
  * Helper function to safely parse JSON strings
@@ -19,7 +21,6 @@ const safeJsonParse = (data) => {
  */
 exports.createSubject = async (req, res) => {
   try {
-    const { name, code, startDate, overview, syllabus, prerequisites } = req.body;
     const userRole = req.user.role;
 
     // Only ADMIN and COUNSELLOR can create subjects
@@ -28,6 +29,23 @@ exports.createSubject = async (req, res) => {
         message: 'Access denied. Only Admin and Counsellor can create subjects',
       });
     }
+
+    // Parse form data using formidable
+    const form = new Formidable({ 
+      multiples: false,
+      maxFileSize: 10 * 1024 * 1024, // 10MB limit
+      keepExtensions: true
+    });
+
+    const [fields, files] = await form.parse(req);
+
+    // Extract field values (formidable returns arrays for fields)
+    const name = fields.name ? fields.name[0] : null;
+    const code = fields.code ? fields.code[0] : null;
+    const startDate = fields.startDate ? fields.startDate[0] : null;
+    const overview = fields.overview ? fields.overview[0] : null;
+    const syllabus = fields.syllabus ? fields.syllabus[0] : null;
+    const prerequisites = fields.prerequisites ? fields.prerequisites[0] : null;
 
     if (!name || !code) {
       return res.status(400).json({
@@ -39,10 +57,16 @@ exports.createSubject = async (req, res) => {
     let imagePublicId = null;
 
     // Upload image if provided
-    if (req.file) {
-      const uploadResult = await uploadImage(req.file.buffer, `subject-${Date.now()}`);
+    if (files.image && files.image.length > 0) {
+      const imageFile = files.image[0];
+      const fileBuffer = await fs.promises.readFile(imageFile.filepath);
+      
+      const uploadResult = await uploadImage(fileBuffer, `subject-${Date.now()}`);
       imageUrl = uploadResult.secure_url;
       imagePublicId = uploadResult.public_id;
+
+      // Clean up temporary file
+      await fs.promises.unlink(imageFile.filepath).catch(() => {});
     }
 
     const subject = await Subject.create({ 
@@ -134,19 +158,41 @@ exports.updateSubject = async (req, res) => {
       });
     }
 
-    const { name, code, startDate, overview, syllabus, prerequisites } = req.body;
+    // Parse form data using formidable
+    const form = new Formidable({ 
+      multiples: false,
+      maxFileSize: 10 * 1024 * 1024, // 10MB limit
+      keepExtensions: true
+    });
+
+    const [fields, files] = await form.parse(req);
+
+    // Extract field values (formidable returns arrays for fields)
+    const name = fields.name ? fields.name[0] : null;
+    const code = fields.code ? fields.code[0] : null;
+    const startDate = fields.startDate ? fields.startDate[0] : null;
+    const overview = fields.overview ? fields.overview[0] : null;
+    const syllabus = fields.syllabus ? fields.syllabus[0] : null;
+    const prerequisites = fields.prerequisites ? fields.prerequisites[0] : null;
+
     let imageUrl = subject.image;
 
     // Handle image update
-    if (req.file) {
-      // If old image exists, delete it and upload new one
+    if (files.image && files.image.length > 0) {
+      // If old image exists, delete it
       if (subject.image) {
         const publicId = subject.image.split('/').pop().split('.')[0];
         await deleteImage(`enquiry_system/${publicId}`);
       }
 
-      const uploadResult = await uploadImage(req.file.buffer, `subject-${Date.now()}`);
+      const imageFile = files.image[0];
+      const fileBuffer = await fs.promises.readFile(imageFile.filepath);
+      
+      const uploadResult = await uploadImage(fileBuffer, `subject-${Date.now()}`);
       imageUrl = uploadResult.secure_url;
+
+      // Clean up temporary file
+      await fs.promises.unlink(imageFile.filepath).catch(() => {});
     }
 
     await subject.update({

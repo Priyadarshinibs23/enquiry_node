@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const assignmentResponseController = require('../controllers/assignmentresponse.controller');
 const auth = require('../middlewares/auth.middleware');
-const upload = require('../middlewares/upload.middleware');
 
 /**
  * CREATE - Submit assignment response
@@ -11,7 +10,6 @@ const upload = require('../middlewares/upload.middleware');
 router.post(
   '/',
   auth,
-  upload.single('submissionFile'),
   assignmentResponseController.createAssignmentResponse
 );
 

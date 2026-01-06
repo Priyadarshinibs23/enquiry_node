@@ -3,14 +3,12 @@ const router = express.Router();
 const materialController = require('../controllers/material.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
-const uploadMiddleware = require('../middlewares/upload.middleware');
 
 // Create a new material (only instructors can upload)
 router.post(
   '/',
   authMiddleware,
   roleMiddleware('instructor', 'admin'),
-  uploadMiddleware.single('document'),
   materialController.createMaterial
 );
 
