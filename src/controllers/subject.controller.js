@@ -253,3 +253,4 @@ exports.deleteSubject = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+//formidable functions are async
