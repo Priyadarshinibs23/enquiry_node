@@ -71,6 +71,8 @@ app.use('/api/feedbacks', require('./routes/feedback.routes'));
 app.use('/api/batch-content', require('./routes/batchContent.routes'));
 app.use('/api/classfeeds', require('./routes/classfeed.routes'));
 app.use('/api/instructor-subjects', require('./routes/instructorsubject.routes'));
+// app.use('/api/attendance', require('./routes/attendance.routes'));
+// app.use('/api/placements', require('./routes/placement.routes'));
 
 // 404 handler
 app.use((req, res) => {

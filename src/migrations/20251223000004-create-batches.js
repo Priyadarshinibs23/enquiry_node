@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.ENUM('yet to start', 'In progress', 'completed'),
         allowNull: true,
       },
-      batchStartDate: {
+      sessionStartDate: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -29,10 +29,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      sessionDate: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
+      // sessionDate replaced by sessionStartDate
       sessionTime: {
         type: Sequelize.STRING,
         allowNull: true,

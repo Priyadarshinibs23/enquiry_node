@@ -1,3 +1,4 @@
+
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/database').development;
 
@@ -26,7 +27,18 @@ db.Announcement = require('./announcement')(sequelize, DataTypes);
 db.BatchStudent = require('./batchstudent')(sequelize, DataTypes);
 db.ClassFeed = require('./classfeed')(sequelize, DataTypes);
 db.InstructorSubject = require('./instructorsubject')(sequelize, DataTypes);
-
+db.Attendance = require('./attendance')(sequelize, DataTypes);
+db.Placement = require('./placement')(sequelize, DataTypes);
+// ONE-TO-MANY: Enquiry has many Placements
+db.Enquiry.hasMany(db.Placement, {
+	foreignKey: 'enquiryId',
+	onDelete: 'CASCADE',
+	as: 'placements',
+});
+db.Placement.belongsTo(db.Enquiry, {
+	foreignKey: 'enquiryId',
+	as: 'enquiry',
+});
 
 // Many-to-many association between Package and Subject using join table 'PackageSubjects'
 db.Package.belongsToMany(db.Subject, {
@@ -394,6 +406,50 @@ db.Subject.belongsToMany(db.User, {
 	foreignKey: 'subjectId',
 	otherKey: 'instructorId',
 	as: 'instructors',
+});
+
+// ONE-TO-MANY: Enquiry has many Attendances
+db.Enquiry.hasMany(db.Attendance, {
+	foreignKey: 'enquiryId',
+	onDelete: 'CASCADE',
+	as: 'attendances',
+});
+db.Attendance.belongsTo(db.Enquiry, {
+	foreignKey: 'enquiryId',
+	as: 'enquiry',
+});
+
+// ONE-TO-MANY: Batch has many Attendances
+db.Batch.hasMany(db.Attendance, {
+	foreignKey: 'batchId',
+	onDelete: 'CASCADE',
+	as: 'attendances',
+});
+db.Attendance.belongsTo(db.Batch, {
+	foreignKey: 'batchId',
+	as: 'batch',
+});
+
+// ONE-TO-MANY: Subject has many Attendances
+db.Subject.hasMany(db.Attendance, {
+	foreignKey: 'subjectId',
+	onDelete: 'CASCADE',
+	as: 'attendances',
+});
+db.Attendance.belongsTo(db.Subject, {
+	foreignKey: 'subjectId',
+	as: 'subject',
+});
+
+// ONE-TO-MANY: User (Instructor) has many Attendances
+db.User.hasMany(db.Attendance, {
+	foreignKey: 'instructorId',
+	onDelete: 'CASCADE',
+	as: 'attendances',
+});
+db.Attendance.belongsTo(db.User, {
+	foreignKey: 'instructorId',
+	as: 'instructor',
 });
 
 module.exports = db;

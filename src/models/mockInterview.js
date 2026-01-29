@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
         references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
       },
+      studentName: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      studentEmail: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       interviewDate: {
         type: DataTypes.DATE,
         allowNull: false,

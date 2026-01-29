@@ -1,11 +1,12 @@
 const db = require('../models');
 const User = db.User;
 const Batch = db.Batch;
+const QRCode = require('qrcode');
 
 // Create Batch
 exports.createBatch = async (req, res) => {
   try {
-    const { name, code, sessionDate, sessionTime, status, numberOfStudents, sessionLink, subjectId } = req.body;
+    const { name, code, sessionDate, sessionEndDate, sessionTime, sessionLink, sessionQr, status, numberOfStudents, approvalStatus: reqApprovalStatus, subjectId } = req.body;
     const userId = req.user.id;  // From authenticated User
     const userRole = req.user.role;  // Role validation
 
@@ -37,20 +38,32 @@ exports.createBatch = async (req, res) => {
     // Set approval status based on user role
     // Admin/Counsellor: approved by default
     // Instructor: pending (needs approval)
-    const approvalStatus = (userRole === 'ADMIN' || userRole === 'COUNSELLOR') ? 'approved' : 'pending';
+    const approvalStatus = (userRole === 'ADMIN' || userRole === 'COUNSELLOR') ? (reqApprovalStatus || 'approved') : 'pending';
 
     const batch = await Batch.create({
       name,
       code,
       sessionDate,
+      sessionEndDate: sessionEndDate || null,
       sessionTime,
+      sessionLink: sessionLink || null,
+      sessionQr: null, // Will be generated after batch is created
       status: status || 'yet to start',
       numberOfStudents: numberOfStudents || 0,
-      sessionLink: sessionLink || null,
       approvalStatus,
       createdBy: userId,
       subjectId,
     });
+
+    // Generate QR code with batch ID and store as base64
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(batch.id.toString());
+      batch.sessionQr = qrCodeDataUrl;
+      await batch.save();
+    } catch (qrError) {
+      console.error('Error generating QR code:', qrError);
+      // Continue without QR code if generation fails
+    }
 
     console.log('Batch created:', batch?.dataValues);
 
@@ -231,7 +244,7 @@ exports.getBatchById = async (req, res) => {
 exports.updateBatch = async (req, res) => {
   try {
     const { batchId } = req.params;
-    const { name, code, sessionDate, sessionTime, status, numberOfStudents, sessionLink } = req.body;
+    const { name, code, sessionDate, sessionEndDate, sessionTime, sessionLink, sessionQr, status, numberOfStudents, approvalStatus: reqApprovalStatus, subjectId } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role;
 
@@ -254,17 +267,31 @@ exports.updateBatch = async (req, res) => {
     if (name) batch.name = name;
     if (code) batch.code = code;
     if (sessionDate) batch.sessionDate = sessionDate;
+    if (sessionEndDate !== undefined) batch.sessionEndDate = sessionEndDate;
     if (sessionTime) batch.sessionTime = sessionTime;
     if (status) batch.status = status;
     if (numberOfStudents !== undefined) batch.numberOfStudents = numberOfStudents;
     if (sessionLink) batch.sessionLink = sessionLink;
+    if (subjectId) batch.subjectId = subjectId;
 
     // ANY instructor update requires approval
     if (userRole === 'instructor') {
       batch.approvalStatus = 'pending';
+    } else if (reqApprovalStatus && (userRole === 'ADMIN' || userRole === 'COUNSELLOR')) {
+      batch.approvalStatus = reqApprovalStatus;
     }
 
     await batch.save();
+
+    // Regenerate QR code with batch ID and store as base64
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(batch.id.toString());
+      batch.sessionQr = qrCodeDataUrl;
+      await batch.save();
+    } catch (qrError) {
+      console.error('Error generating QR code:', qrError);
+      // Continue without QR code if generation fails
+    }
 
     console.log('Batch updated:', batch?.dataValues);
 

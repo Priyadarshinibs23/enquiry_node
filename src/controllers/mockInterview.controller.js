@@ -3,24 +3,37 @@ const MockInterview = db.MockInterview;
 const Enquiry = db.Enquiry;
 const Batch = db.Batch;
 const User = db.User;
+const { Formidable } = require('formidable');
+const fs = require('fs').promises;
+const path = require('path');
+const { uploadDocument } = require('../utils/cloudinary');
 
 // CREATE - Schedule a Mock Interview
 exports.scheduleMockInterview = async (req, res) => {
+  const form = new Formidable({ multiples: false, maxFileSize: 50 * 1024 * 1024, keepExtensions: true });
+  
   try {
-    const {
-      batchId,
-      enquiryId,
-      interviewDate,
-      interviewTime,
-      mode,
-      interviewLink,
-      documentUpload,
-    } = req.body;
+    console.log('=== Mock Interview Schedule Request Started ===');
+    console.log('User ID:', req.user?.id);
+    console.log('User Role:', req.user?.role);
+
+    const [fields, files] = await form.parse(req);
+    
+    const batchId = fields.batchId ? fields.batchId[0] : null;
+    const enquiryId = fields.enquiryId ? fields.enquiryId[0] : null;
+    const interviewDate = fields.interviewDate ? fields.interviewDate[0] : null;
+    const interviewTime = fields.interviewTime ? fields.interviewTime[0] : null;
+    const mode = fields.mode ? fields.mode[0] : null;
+    const interviewLink = fields.interviewLink ? fields.interviewLink[0] : null;
+
+    console.log('Extracted Fields:', { batchId, enquiryId, interviewDate, interviewTime, mode, interviewLink });
+
     const instructorId = req.user.id;
     const userRole = req.user.role;
 
     // Validate required fields
     if (!batchId || !enquiryId || !interviewDate || !interviewTime || !mode) {
+      console.log('Validation Failed - Missing required fields');
       return res.status(400).json({
         message: 'batchId, enquiryId, interviewDate, interviewTime, and mode are required',
       });
@@ -28,52 +41,119 @@ exports.scheduleMockInterview = async (req, res) => {
 
     // Only instructors, admin, or counsellor can schedule interviews
     if (userRole !== 'instructor' && userRole !== 'ADMIN' && userRole !== 'COUNSELLOR') {
+      console.log('Authorization Failed - User role:', userRole);
       return res.status(403).json({
         message: 'Only instructors, admin, or counsellor can schedule mock interviews',
       });
     }
 
     // Get enquiry details with candidate status check
+    console.log('Finding Enquiry with ID:', enquiryId);
     const enquiry = await Enquiry.findByPk(enquiryId);
     if (!enquiry) {
+      console.log('Enquiry not found with ID:', enquiryId);
       return res.status(404).json({ message: 'Enquiry not found' });
     }
 
+    console.log('Enquiry found:', { id: enquiry.id, name: enquiry.name, candidateStatus: enquiry.candidateStatus });
+
     if (enquiry.candidateStatus !== 'class') {
+      console.log('Enquiry status check failed:', enquiry.candidateStatus);
       return res.status(400).json({
         message: 'Only candidates with "class" status can be interviewed',
       });
     }
 
     // Verify batch exists
+    console.log('Finding Batch with ID:', batchId);
     const batch = await Batch.findByPk(batchId);
     if (!batch) {
+      console.log('Batch not found with ID:', batchId);
       return res.status(404).json({ message: 'Batch not found' });
     }
 
+    console.log('Batch found:', { id: batch.id, name: batch.name });
+
+    // Handle document upload to Cloudinary
+    let documentUploadUrl = null;
+    
+    if (files.document && files.document[0]) {
+      console.log('Document file found, uploading to Cloudinary...');
+      try {
+        const file = files.document[0];
+        const fileBuffer = await fs.readFile(file.filepath);
+        console.log('File buffer size:', fileBuffer.length);
+        
+        const fileName = `mockinterview_${enquiryId}_${Date.now()}`;
+        console.log('Uploading with filename:', fileName);
+        
+        const uploadResult = await uploadDocument(fileBuffer, fileName);
+        documentUploadUrl = uploadResult.secure_url;
+        console.log('Upload successful. URL:', documentUploadUrl);
+      } catch (uploadError) {
+        console.error('Upload error:', uploadError);
+        return res.status(400).json({
+          message: 'Failed to upload document',
+          error: uploadError.message,
+        });
+      } finally {
+        // Cleanup temp file
+        if (files.document && files.document[0]) {
+          await fs.unlink(files.document[0].filepath).catch(() => {});
+          console.log('Temp file cleaned up');
+        }
+      }
+    } else if (fields.documentUrl) {
+      console.log('Document URL provided (no file)');
+      documentUploadUrl = fields.documentUrl[0];
+      console.log('Document URL:', documentUploadUrl);
+    } else {
+      console.log('No document file or URL provided');
+    }
+
     // Create mock interview
+    console.log('Creating Mock Interview record...');
     const mockInterview = await MockInterview.create({
       batchId,
       enquiryId,
-      instructorId: userRole === 'instructor' ? instructorId : req.body.instructorId || instructorId,
+      instructorId: userRole === 'instructor' ? instructorId : (fields.instructorId ? fields.instructorId[0] : instructorId),
       studentName: enquiry.name,
       studentEmail: enquiry.email,
       interviewDate,
       interviewTime,
       mode,
       interviewLink: interviewLink || null,
-      documentUpload: documentUpload || null,
+      documentUpload: documentUploadUrl || null,
       status: 'scheduled',
+    });
+
+    console.log('Mock Interview created successfully:', { id: mockInterview.id, status: mockInterview.status });
+
+    // Fetch the created interview with enquiry details
+    const createdInterview = await MockInterview.findByPk(mockInterview.id, {
+      include: [
+        { model: Enquiry, as: 'enquiry', attributes: ['id', 'name', 'email'] },
+        { model: Batch, as: 'batch', attributes: ['id', 'name', 'code'] },
+        { model: User, as: 'instructor', attributes: ['id', 'name', 'email'] },
+      ],
     });
 
     res.status(201).json({
       success: true,
       message: 'Mock interview scheduled successfully',
-      data: mockInterview,
+      data: createdInterview,
     });
   } catch (error) {
-    console.error('Error in scheduleMockInterview:', error);
-    res.status(500).json({ message: error.message });
+    console.error('=== Error in scheduleMockInterview ===');
+    console.error('Error Type:', error.constructor.name);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+    
+    res.status(500).json({ 
+      message: 'Server error',
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

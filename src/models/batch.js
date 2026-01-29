@@ -5,10 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       code: DataTypes.STRING,
       status: DataTypes.ENUM('yet to start', 'In progress', 'completed'),
-      batchStartDate: DataTypes.DATE,
       sessionLink: DataTypes.STRING,
       sessionDate: DataTypes.DATE,
+      sessionEndDate: DataTypes.DATE,
       sessionTime: DataTypes.STRING,
+      sessionQr: DataTypes.STRING,
       numberOfStudents: {
         type: DataTypes.INTEGER,
         allowNull: true,
