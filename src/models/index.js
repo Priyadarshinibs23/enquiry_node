@@ -1,4 +1,3 @@
-
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/database').development;
 
@@ -28,7 +27,54 @@ db.BatchStudent = require('./batchstudent')(sequelize, DataTypes);
 db.ClassFeed = require('./classfeed')(sequelize, DataTypes);
 db.InstructorSubject = require('./instructorsubject')(sequelize, DataTypes);
 db.Attendance = require('./attendance')(sequelize, DataTypes);
-db.Placement = require('./placement')(sequelize, DataTypes);
+db.Placement = require('./userplacementdetails')(sequelize, DataTypes);
+db.WorkExperience = require('./workexperience')(sequelize, DataTypes);
+db.HigherEducation = require('./highereducation')(sequelize, DataTypes);
+db.Certification = require('./certification')(sequelize, DataTypes);
+db.Project = require('./project')(sequelize, DataTypes);
+// ONE-TO-MANY: Placement (UserPlacementDetail) has many WorkExperiences
+db.Placement.hasMany(db.WorkExperience, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'workExperiences',
+	onDelete: 'CASCADE',
+});
+db.WorkExperience.belongsTo(db.Placement, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'userPlacementDetail',
+});
+
+// ONE-TO-MANY: Placement (UserPlacementDetail) has many HigherEducations
+db.Placement.hasMany(db.HigherEducation, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'higherEducations',
+	onDelete: 'CASCADE',
+});
+db.HigherEducation.belongsTo(db.Placement, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'userPlacementDetail',
+});
+
+// ONE-TO-MANY: Placement (UserPlacementDetail) has many Certifications
+db.Placement.hasMany(db.Certification, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'certifications',
+	onDelete: 'CASCADE',
+});
+db.Certification.belongsTo(db.Placement, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'userPlacementDetail',
+});
+
+// ONE-TO-MANY: Placement (UserPlacementDetail) has many Projects
+db.Placement.hasMany(db.Project, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'projects',
+	onDelete: 'CASCADE',
+});
+db.Project.belongsTo(db.Placement, {
+	foreignKey: 'userPlacementDetailId',
+	as: 'userPlacementDetail',
+});
 // ONE-TO-MANY: Enquiry has many Placements
 db.Enquiry.hasMany(db.Placement, {
 	foreignKey: 'enquiryId',

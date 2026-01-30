@@ -35,10 +35,16 @@ exports.createBatch = async (req, res) => {
       });
     }
 
+
     // Set approval status based on user role
-    // Admin/Counsellor: approved by default
-    // Instructor: pending (needs approval)
-    const approvalStatus = (userRole === 'ADMIN' || userRole === 'COUNSELLOR') ? (reqApprovalStatus || 'approved') : 'pending';
+    // Admin/Counsellor: always approved, cannot be overridden by request
+    // Instructor: always pending
+    let approvalStatus;
+    if (userRole === 'ADMIN' || userRole === 'COUNSELLOR') {
+      approvalStatus = 'approved';
+    } else {
+      approvalStatus = 'pending';
+    }
 
     const batch = await Batch.create({
       name,
