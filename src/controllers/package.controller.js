@@ -342,11 +342,12 @@ exports.deletePackage = async (req, res) => {
       message: 'Package deleted successfully',
     });
   } catch (error) {
+    // testing
     console.error('Error in deletePackage:', error.message, error.stack);
     return res.status(500).json({ 
       message: 'Server error',
       error: error.message 
-      
+
     });
   }
 };
